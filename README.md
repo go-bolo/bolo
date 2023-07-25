@@ -2,7 +2,7 @@
 
 Beware: In development!!!!!!!
 
-Catupiri framework core module
+Go Bolo framework core module
 
 ## usage
 
