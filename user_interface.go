@@ -1,4 +1,4 @@
-package catu
+package bolo
 
 type UserInterface interface {
 	// getters:

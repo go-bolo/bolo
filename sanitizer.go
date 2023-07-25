@@ -1,4 +1,4 @@
-package catu
+package bolo
 
 import (
 	"github.com/microcosm-cc/bluemonday"

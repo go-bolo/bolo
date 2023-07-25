@@ -1,4 +1,4 @@
-package catu
+package bolo
 
 import (
 	"bytes"
@@ -12,9 +12,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-catupiry/catu/helpers"
-	"github.com/go-catupiry/catu/pagination"
-	"github.com/go-catupiry/query_parser_to_db"
+	"github.com/go-bolo/bolo/helpers"
+	"github.com/go-bolo/bolo/pagination"
+	"github.com/go-bolo/query_parser_to_db"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -468,7 +468,7 @@ func (r *RequestContext) Partial(name string, data interface{}) template.HTML {
 		logrus.WithFields(logrus.Fields{
 			"partialName": name,
 			"error":       fmt.Sprintf("%+v\n", err),
-		}).Error("catu.Partial error on render partial template")
+		}).Error("bolo.Partial error on render partial template")
 		return template.HTML("")
 	}
 

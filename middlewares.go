@@ -1,4 +1,4 @@
-package catu
+package bolo
 
 import (
 	"net/http"
@@ -11,7 +11,7 @@ import (
 
 // BindMiddlewares - Bind middlewares in order
 func BindMiddlewares(app App, p *Plugin) {
-	logrus.Debug("catu.BindMiddlewares " + p.GetName())
+	logrus.Debug("bolo.BindMiddlewares " + p.GetName())
 
 	goEnv := app.GetConfiguration().Get("GO_ENV")
 

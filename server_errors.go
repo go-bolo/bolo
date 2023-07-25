@@ -1,4 +1,4 @@
-package catu
+package bolo
 
 import (
 	"errors"
@@ -75,7 +75,7 @@ type ValidationFieldError struct {
 func CustomHTTPErrorHandler(err error, c echo.Context) {
 	logrus.WithFields(logrus.Fields{
 		"err": fmt.Sprintf("%+v\n", err),
-	}).Debug("catu.CustomHTTPErrorHandler running")
+	}).Debug("bolo.CustomHTTPErrorHandler running")
 
 	var ctx *RequestContext
 
@@ -151,7 +151,7 @@ func forbiddenErrorHandler(err error, c echo.Context) error {
 		}
 	}
 
-	logrus.WithFields(logParams).Debug("catu.forbiddenErrorHandler running")
+	logrus.WithFields(logParams).Debug("bolo.forbiddenErrorHandler running")
 
 	switch ctx.GetResponseContentType() {
 	case "text/html":
@@ -178,7 +178,7 @@ func unAuthorizedErrorHandler(err error, ctx *RequestContext) error {
 		"method":            ctx.Request().Method,
 		"AuthenticatedUser": ctx.AuthenticatedUser,
 		"roles":             ctx.GetAuthenticatedRoles(),
-	}).Info("catu.unAuthorizedErrorHandler running")
+	}).Info("bolo.unAuthorizedErrorHandler running")
 
 	switch ctx.GetResponseContentType() {
 	case "text/html":
@@ -202,7 +202,7 @@ func notFoundErrorHandler(err error, ctx *RequestContext) error {
 	logrus.WithFields(logrus.Fields{
 		"err":  fmt.Sprintf("%+v\n", err),
 		"code": "404",
-	}).Debug("catu.notFoundErrorHandler running")
+	}).Debug("bolo.notFoundErrorHandler running")
 
 	switch ctx.GetResponseContentType() {
 	case "text/html":
@@ -224,7 +224,7 @@ func validationError(ve validator.ValidationErrors, err error, ctx *RequestConte
 	logrus.WithFields(logrus.Fields{
 		"err":  fmt.Sprintf("%+v\n", err),
 		"code": "400",
-	}).Debug("catu.validationError running")
+	}).Debug("bolo.validationError running")
 
 	resp := ValidationResponse{}
 

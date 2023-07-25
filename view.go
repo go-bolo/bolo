@@ -1,4 +1,4 @@
-package catu
+package bolo
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-catupiry/catu/pagination"
+	"github.com/go-bolo/bolo/pagination"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -60,9 +60,9 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 		err := ctx.RenderTemplate(&contentBuffer, name, htmlContext)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
-				"error": fmt.Sprintf("%+v\n", errors.Wrap(err, "catu.theme.Render error on render template")),
+				"error": fmt.Sprintf("%+v\n", errors.Wrap(err, "bolo.theme.Render error on render template")),
 				"name":  name,
-			}).Error("catu.theme.Render error on execute template")
+			}).Error("bolo.theme.Render error on execute template")
 			return err
 		}
 
@@ -76,7 +76,7 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 				"name":   name,
 				"theme":  ctx.Theme,
 				"layout": ctx.Layout,
-			}).Error("catu.theme.Render error on execute layout template")
+			}).Error("bolo.theme.Render error on execute layout template")
 			return err
 		}
 

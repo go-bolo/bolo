@@ -2,13 +2,13 @@
 
 Beware: In development!!!!!!!
 
-Catupiri framework core module
+Go Bolo framework core module
 
 ## usage
 
 ```go
 // Start the new app:
-app := catu.NewApp()
+app := bolo.NewApp()
 // Register your plugins
 app.RegisterPlugin("mm", mm.NewPlugin())
 // Start the bootstrap process, will load all resources, bind routes, middlewares ...

@@ -28,7 +28,7 @@ func GetPageHTML(url string, headers http.Header) (string, error) {
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": fmt.Sprintf("%+v\n", err),
-		}).Debug("catu.GetPageHTML error")
+		}).Debug("bolo.GetPageHTML error")
 		return "", errors.Wrap(err, "GetPageHTML error")
 	}
 

@@ -1,10 +1,10 @@
-package catu
+package bolo
 
 import (
 	"html/template"
 
-	"github.com/go-catupiry/catu/helpers"
-	"github.com/go-catupiry/catu/pagination"
+	"github.com/go-bolo/bolo/helpers"
+	"github.com/go-bolo/bolo/pagination"
 	"github.com/shopspring/decimal"
 	"github.com/sirupsen/logrus"
 )
