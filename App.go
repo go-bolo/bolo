@@ -1,4 +1,4 @@
-package catu
+package bolo
 
 import (
 	"encoding/json"
@@ -14,13 +14,13 @@ import (
 	"time"
 
 	"github.com/Masterminds/sprig"
-	"github.com/go-catupiry/catu/acl"
-	"github.com/go-catupiry/catu/configuration"
-	"github.com/go-catupiry/catu/helpers"
-	"github.com/go-catupiry/catu/http_client"
-	"github.com/go-catupiry/catu/logger"
-	"github.com/go-catupiry/catu/pagination"
-	"github.com/go-catupiry/query_parser_to_db"
+	"github.com/go-bolo/bolo/acl"
+	"github.com/go-bolo/bolo/configuration"
+	"github.com/go-bolo/bolo/helpers"
+	"github.com/go-bolo/bolo/http_client"
+	"github.com/go-bolo/bolo/logger"
+	"github.com/go-bolo/bolo/pagination"
+	"github.com/go-bolo/query_parser_to_db"
 	"github.com/go-playground/validator/v10"
 	"github.com/gookit/event"
 	"github.com/labstack/echo/v4"
@@ -262,7 +262,7 @@ func (r *AppStruct) SetDB(db *gorm.DB) error {
 func (r *AppStruct) Bootstrap() error {
 	var err error
 
-	logrus.Debug("catu.App.Bootstrap running")
+	logrus.Debug("bolo.App.Bootstrap running")
 	// default roles and permissions, override it on your app
 	json.Unmarshal([]byte(r.RolesString), &r.RolesList)
 
@@ -289,7 +289,7 @@ func (r *AppStruct) Bootstrap() error {
 
 	logrus.WithFields(logrus.Fields{
 		"count": len(r.templateFunctions),
-	}).Debug("catu.App.Bootstrap template functions loaded")
+	}).Debug("bolo.App.Bootstrap template functions loaded")
 
 	err = r.LoadTemplates()
 	if err != nil {
@@ -358,10 +358,10 @@ func (r *AppStruct) InitDatabase(name, engine string, isDefault bool) error {
 		"dbURI":           dbURI,
 		"dbSlowThreshold": dbSlowThreshold,
 		"logQuery":        logQuery,
-	}).Debug("catu.App.InitDatabase starting db with configs")
+	}).Debug("bolo.App.InitDatabase starting db with configs")
 
 	if dbURI == "" {
-		return errors.New("catu.App.InitDatabase DB_URI environment variable is required")
+		return errors.New("bolo.App.InitDatabase DB_URI environment variable is required")
 	}
 
 	dsn := dbURI + "?charset=utf8mb4&parseTime=True&loc=Local"
@@ -398,11 +398,11 @@ func (r *AppStruct) InitDatabase(name, engine string, isDefault bool) error {
 		db, err = gorm.Open(sqlite.Open(dbURI), gormCFG)
 
 	default:
-		return errors.New("catu.App.InitDatabase invalid database engine. Options available: mysql or sqlite")
+		return errors.New("bolo.App.InitDatabase invalid database engine. Options available: mysql or sqlite")
 	}
 
 	if err != nil {
-		return errors.Wrap(err, "catu.App.InitDatabase error on database connection")
+		return errors.Wrap(err, "bolo.App.InitDatabase error on database connection")
 	}
 
 	if isDefault {
@@ -497,7 +497,7 @@ func (r *AppStruct) LoadTemplates() error {
 		logrus.WithFields(logrus.Fields{
 			// "error":   errHealthCheckHandlerr,
 			"rootDir": rootDir,
-		}).Error("catu.App.LoadTemplates Error on parse templates")
+		}).Error("bolo.App.LoadTemplates Error on parse templates")
 		r.templates = tpls
 		return err
 	}
@@ -506,7 +506,7 @@ func (r *AppStruct) LoadTemplates() error {
 
 	logrus.WithFields(logrus.Fields{
 		"count": len(r.templates.Templates()),
-	}).Debug("catu.App.ParseTemplates templates loaded")
+	}).Debug("bolo.App.ParseTemplates templates loaded")
 
 	return nil
 }
@@ -527,7 +527,7 @@ func (r *AppStruct) Close() error {
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"error": fmt.Sprintf("%+v\n", err),
-		}).Debug("catu.App.Close error")
+		}).Debug("bolo.App.Close error")
 	}
 
 	return nil

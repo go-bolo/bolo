@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/go-catupiry/catu/configuration"
+	"github.com/go-bolo/bolo/configuration"
 )
 
 func FormatDate(date *time.Time, format string) string {

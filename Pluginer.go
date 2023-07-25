@@ -1,4 +1,4 @@
-package catu
+package bolo
 
 type Pluginer interface {
 	Init(app App) error

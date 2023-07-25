@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-catupiry/catu/configuration"
+	"github.com/go-bolo/bolo/configuration"
 )
 
 // CustomHTTPClient - Custom http client required to make requests testable

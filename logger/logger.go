@@ -3,7 +3,7 @@ package logger
 import (
 	"os"
 
-	"github.com/go-catupiry/catu/configuration"
+	"github.com/go-bolo/bolo/configuration"
 	"github.com/sirupsen/logrus"
 )
 

@@ -3,7 +3,7 @@ package helpers_test
 import (
 	"testing"
 
-	"github.com/go-catupiry/catu/helpers"
+	"github.com/go-bolo/bolo/helpers"
 	"github.com/stretchr/testify/assert"
 )
 

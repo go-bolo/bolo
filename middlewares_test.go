@@ -1,4 +1,4 @@
-package catu
+package bolo
 
 // Tests example:
 // func TestContentNegotiationMiddleware(t *testing.T) {

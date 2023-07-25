@@ -1,4 +1,4 @@
-package catu
+package bolo
 
 import (
 	"github.com/gookit/event"
@@ -12,7 +12,7 @@ type Plugin struct {
 func (p *Plugin) Init(a App) error {
 	logrus.WithFields(logrus.Fields{
 		"PluginName": p.Name,
-	}).Debug("catu.Plugin.Init Running init")
+	}).Debug("bolo.Plugin.Init Running init")
 
 	a.GetEvents().On("bindMiddlewares", event.ListenerFunc(func(e event.Event) error {
 		return p.BindMiddlewares(a)

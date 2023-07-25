@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-catupiry/catu/acl"
+	"github.com/go-bolo/bolo/acl"
 	"github.com/stretchr/testify/assert"
 )
 

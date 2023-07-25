@@ -1,9 +1,9 @@
-package catu
+package bolo
 
 import (
 	"os"
 
-	"github.com/go-catupiry/catu/configuration"
+	"github.com/go-bolo/bolo/configuration"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
