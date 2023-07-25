@@ -15,7 +15,7 @@ func init() {
 }
 
 func Init(options *AppOptions) App {
-	appInstance = newApp(options)
+	appInstance = NewApp(options)
 
 	InitSanitizer()
 

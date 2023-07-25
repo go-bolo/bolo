@@ -24,6 +24,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gookit/event"
 	"github.com/labstack/echo/v4"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
@@ -73,6 +74,10 @@ type App interface {
 
 	GetConfiguration() configuration.ConfigurationInterface
 
+	// HTML / Text sanitizer:
+	GetSanitizer() *bluemonday.Policy
+	SetSanitizer(policy *bluemonday.Policy) error
+
 	GetDB() *gorm.DB
 	SetDB(db *gorm.DB) error
 	Migrate() error
@@ -116,6 +121,17 @@ type AppStruct struct {
 	Layout            string
 	templates         *template.Template
 	templateFunctions template.FuncMap
+
+	sanitizer *bluemonday.Policy
+}
+
+func (app *AppStruct) GetSanitizer() *bluemonday.Policy {
+	return app.sanitizer
+}
+
+func (app *AppStruct) SetSanitizer(sanitizer *bluemonday.Policy) error {
+	app.sanitizer = sanitizer
+	return nil
 }
 
 func (r *AppStruct) RegisterPlugin(p Pluginer) {
@@ -533,7 +549,7 @@ func (r *AppStruct) Close() error {
 	return nil
 }
 
-func newApp(options *AppOptions) App {
+func NewApp(options *AppOptions) App {
 	cfg := configuration.NewCfg()
 	logger.Init()
 
@@ -558,6 +574,9 @@ func newApp(options *AppOptions) App {
 			return next(cc)
 		}
 	})
+	// Default police:
+	app.sanitizer = bluemonday.UGCPolicy()
+	app.sanitizer.AllowDataURIImages()
 
 	app.router.Binder = &CustomBinder{}
 	app.router.HTTPErrorHandler = CustomHTTPErrorHandler
