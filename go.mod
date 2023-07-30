@@ -1,15 +1,18 @@
 module github.com/go-bolo/bolo
 
-go 1.17
+go 1.20
 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
+	github.com/approvals/go-approval-tests v0.0.0-20220530063708-32d5677069bd
 	github.com/cuducos/go-cnpj v0.1.1
+	github.com/go-bolo/clock v0.0.3
 	github.com/go-bolo/query_parser_to_db v1.0.0
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/gookit/event v1.1.1
 	github.com/gosimple/slug v1.13.1
 	github.com/joho/godotenv v1.5.1
+	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/leekchan/accounting v1.0.0
 	github.com/microcosm-cc/bluemonday v1.0.25
@@ -18,6 +21,8 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.4
+	github.com/tdewolff/minify/v2 v2.12.7
+	go.uber.org/zap v1.24.0
 	golang.org/x/text v0.11.0
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/driver/sqlite v1.5.2
@@ -50,8 +55,11 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/tdewolff/parse/v2 v2.6.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.11.0 // indirect
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect

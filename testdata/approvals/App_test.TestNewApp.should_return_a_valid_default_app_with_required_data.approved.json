@@ -1,0 +1,24 @@
+{
+  "InitTime": "0001-01-01T00:00:00Z",
+  "Options": {
+    "GormOptions": null
+  },
+  "Events": {
+    "EnableLock": true,
+    "ChannelSize": 100,
+    "ConsumerNum": 3,
+    "MatchMode": 0
+  },
+  "Configuration": {},
+  "Plugins": {
+    "bolo": {
+      "Name": "bolo"
+    }
+  },
+  "Models": {},
+  "Resources": {},
+  "RolesString": "{\n\t\"administrator\": {\n\t\t\"name\": \"administrator\",\n\t\t\"permissions\": [],\n\t\t\"canAddInUsers\": true,\n\t\t\"isSystemRole\": true\n\t},\n\t\"authenticated\": {\n\t\t\"name\": \"authenticated\",\n\t\t\"permissions\": [],\n\t\t\"isSystemRole\": true\n\t},\n\t\"unAuthenticated\": {\n\t\t\"name\": \"unAuthenticated\",\n\t\t\"permissions\": [],\n\t\t\"isSystemRole\": true\n\t},\n\t\"owner\": {\n\t\t\"name\": \"owner\",\n\t\t\"permissions\": [],\n\t\t\"isSystemRole\": true\n\t}}",
+  "RolesList": null,
+  "Theme": "site",
+  "Layout": "layouts/default"
+}

@@ -1,6 +1,8 @@
 package bolo
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 
 	"github.com/go-bolo/bolo/configuration"
@@ -47,4 +49,13 @@ func GetConfiguration() configuration.ConfigurationInterface {
 
 func GetDefaultDatabaseConnection() *gorm.DB {
 	return appInstance.GetDB()
+}
+
+// NewBotContext - Create a new request context for non http calls and testing
+func NewBotContext(app App) (*RequestContext, error) {
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
+	res := httptest.NewRecorder()
+	c := app.GetRouter().NewContext(req, res)
+
+	return NewRequestContext(&RequestContextOpts{App: app, EchoContext: c}), nil
 }

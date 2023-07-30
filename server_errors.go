@@ -72,65 +72,67 @@ type ValidationFieldError struct {
 	Message string `json:"message"`
 }
 
-func CustomHTTPErrorHandler(err error, c echo.Context) {
-	logrus.WithFields(logrus.Fields{
-		"err": fmt.Sprintf("%+v\n", err),
-	}).Debug("bolo.CustomHTTPErrorHandler running")
-
-	var ctx *RequestContext
-
-	switch v := c.(type) {
-	case *RequestContext:
-		ctx = v
-	default:
-		ctx = NewRequestContext(&RequestContextOpts{EchoContext: c})
-	}
-
-	code := 0
-	if he, ok := err.(HTTPErrorInterface); ok {
-		code = he.GetCode()
-		if ctx.GetResponseContentType() == "application/json" {
-			c.JSON(code, he)
-			return
-		}
-	}
-
-	if he, ok := err.(*echo.HTTPError); ok {
-		code = he.Code
-		if ctx.GetResponseContentType() == "application/json" {
-			c.JSON(code, he)
-			return
-		}
-	}
-
-	if ve, ok := err.(validator.ValidationErrors); ok {
-		validationError(ve, err, ctx)
-		return
-	}
-
-	if code == 0 && err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		code = 404
-	}
-
-	switch code {
-	case 401:
-		unAuthorizedErrorHandler(err, ctx)
-	case 403:
-		forbiddenErrorHandler(err, ctx)
-	case 404:
-		notFoundErrorHandler(err, ctx)
-	case 500:
-		internalServerErrorHandler(err, ctx)
-	default:
+func CustomHTTPErrorHandler(app App) func(err error, c echo.Context) {
+	return func(err error, c echo.Context) {
 		logrus.WithFields(logrus.Fields{
-			"error":             fmt.Sprintf("%+v\n", err),
-			"statusCode":        code,
-			"path":              c.Path(),
-			"method":            c.Request().Method,
-			"AuthenticatedUser": ctx.AuthenticatedUser,
-			"roles":             ctx.GetAuthenticatedRoles(),
-		}).Warn("customHTTPErrorHandler unknown error status code")
-		c.JSON(http.StatusInternalServerError, &HTTPError{Code: 500, Message: "Unknown Error"})
+			"err": fmt.Sprintf("%+v\n", err),
+		}).Debug("bolo.CustomHTTPErrorHandler running")
+
+		var ctx *RequestContext
+
+		switch v := c.(type) {
+		case *RequestContext:
+			ctx = v
+		default:
+			ctx = NewRequestContext(&RequestContextOpts{App: app, EchoContext: c})
+		}
+
+		code := 0
+		if he, ok := err.(HTTPErrorInterface); ok {
+			code = he.GetCode()
+			if ctx.GetResponseContentType() == "application/json" {
+				c.JSON(code, he)
+				return
+			}
+		}
+
+		if he, ok := err.(*echo.HTTPError); ok {
+			code = he.Code
+			if ctx.GetResponseContentType() == "application/json" {
+				c.JSON(code, he)
+				return
+			}
+		}
+
+		if ve, ok := err.(validator.ValidationErrors); ok {
+			validationError(ve, err, ctx)
+			return
+		}
+
+		if code == 0 && err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+			code = 404
+		}
+
+		switch code {
+		case 401:
+			unAuthorizedErrorHandler(err, ctx)
+		case 403:
+			forbiddenErrorHandler(err, ctx)
+		case 404:
+			notFoundErrorHandler(err, ctx)
+		case 500:
+			internalServerErrorHandler(err, ctx)
+		default:
+			logrus.WithFields(logrus.Fields{
+				"error":             fmt.Sprintf("%+v\n", err),
+				"statusCode":        code,
+				"path":              c.Path(),
+				"method":            c.Request().Method,
+				"AuthenticatedUser": ctx.AuthenticatedUser,
+				"roles":             ctx.GetAuthenticatedRoles(),
+			}).Warn("customHTTPErrorHandler unknown error status code")
+			c.JSON(http.StatusInternalServerError, &HTTPError{Code: 500, Message: "Unknown Error"})
+		}
 	}
 }
 

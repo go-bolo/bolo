@@ -149,15 +149,6 @@ func renderPager(ctx *RequestContext, r *pagination.Pager, queryString string) t
 		return template.HTML("")
 	}
 
-	// logrus.WithFields(logrus.Fields{
-	// 	"pageCount":  pageCount,
-	// 	"totalLinks": totalLinks,
-	// 	"MaxLinks":   r.MaxLinks,
-	// 	"Page":       r.Page,
-	// 	"before":     r.MaxLinks+2 < r.Page,
-	// 	"after":      r.MaxLinks+r.Page+1 < pageCount,
-	// }).Debug("Calculing 1>>>")
-
 	if totalLinks < pageCount {
 		if r.MaxLinks+2 < r.Page {
 			startInPage = r.Page - r.MaxLinks
