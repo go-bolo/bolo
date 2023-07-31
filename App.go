@@ -20,10 +20,12 @@ import (
 	"github.com/go-bolo/bolo/http_client"
 	"github.com/go-bolo/bolo/logger"
 	"github.com/go-bolo/bolo/pagination"
+	"github.com/go-bolo/clock"
 	"github.com/go-bolo/query_parser_to_db"
 	"github.com/go-playground/validator/v10"
 	"github.com/gookit/event"
 	"github.com/labstack/echo/v4"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
@@ -38,6 +40,9 @@ type App interface {
 	GetPlugins() map[string]Pluginer
 	GetPlugin(name string) Pluginer
 	SetPlugin(name string, plugin Pluginer) error
+
+	GetClock() clock.Clock
+	SetClock(clock clock.Clock) error
 
 	GetRouter() *echo.Echo
 	SetRouterGroup(name, path string) *echo.Group
@@ -64,7 +69,7 @@ type App interface {
 
 	Can(permission string, userRoles []string) bool
 	SetRole(name string, role acl.Role) error
-	GetRoles() map[string]acl.Role
+	GetRoles() map[string]*acl.Role
 	GetRole(name string) *acl.Role
 	SetRolePermission(name string, permission string, hasAccess bool) error
 	GetRolePermission(name string, permission string) bool
@@ -72,6 +77,10 @@ type App interface {
 	GetEvents() *event.Manager
 
 	GetConfiguration() configuration.ConfigurationInterface
+
+	// HTML / Text sanitizer:
+	GetSanitizer() *bluemonday.Policy
+	SetSanitizer(policy *bluemonday.Policy) error
 
 	GetDB() *gorm.DB
 	SetDB(db *gorm.DB) error
@@ -89,15 +98,17 @@ type AppOptions struct {
 type AppStruct struct {
 	InitTime time.Time
 
+	clock clock.Clock
+
 	Options *AppOptions
 
 	Events *event.Manager
 
 	Configuration configuration.ConfigurationInterface
 	// Default database
-	DB *gorm.DB
+	DB *gorm.DB `json:"-"`
 	// avaible databases
-	DBs map[string]*gorm.DB
+	DBs map[string]*gorm.DB `json:"-"`
 
 	Plugins map[string]Pluginer
 
@@ -109,13 +120,24 @@ type AppStruct struct {
 	routerGroups map[string]*echo.Group
 
 	RolesString string
-	RolesList   map[string]acl.Role
+	RolesList   map[string]*acl.Role
 	// default theme for HTML responses
 	Theme string
 	// default layout for HTML responses
 	Layout            string
 	templates         *template.Template
 	templateFunctions template.FuncMap
+
+	sanitizer *bluemonday.Policy
+}
+
+func (app *AppStruct) GetSanitizer() *bluemonday.Policy {
+	return app.sanitizer
+}
+
+func (app *AppStruct) SetSanitizer(sanitizer *bluemonday.Policy) error {
+	app.sanitizer = sanitizer
+	return nil
 }
 
 func (r *AppStruct) RegisterPlugin(p Pluginer) {
@@ -139,6 +161,15 @@ func (r *AppStruct) GetPlugins() map[string]Pluginer {
 	return r.Plugins
 }
 
+func (app *AppStruct) GetClock() clock.Clock {
+	return app.clock
+}
+
+func (app *AppStruct) SetClock(clock clock.Clock) error {
+	app.clock = clock
+	return nil
+}
+
 func (r *AppStruct) GetRouter() *echo.Echo {
 	return r.router
 }
@@ -151,7 +182,7 @@ func (app *AppStruct) NewRequestContext(opts *RequestContextOpts) *RequestContex
 
 	ctx := RequestContext{
 		App:         app,
-		EchoContext: opts.EchoContext,
+		echoContext: opts.EchoContext,
 		Protocol:    protocol,
 		Domain:      domain,
 		AppOrigin:   cfg.GetF("APP_ORIGIN", protocol+"://"+domain+":"+port),
@@ -163,8 +194,8 @@ func (app *AppStruct) NewRequestContext(opts *RequestContextOpts) *RequestContex
 		Pager:  pagination.NewPager(),
 	}
 
-	if ctx.EchoContext == nil {
-		ctx.EchoContext = echo.New().NewContext(&http.Request{}, &helpers.FakeResponseWriter{})
+	if ctx.echoContext == nil {
+		ctx.echoContext = echo.New().NewContext(&http.Request{}, &helpers.FakeResponseWriter{})
 	}
 
 	// Is a context used on CLIs, not in HTTP request / echo then skip it
@@ -284,7 +315,6 @@ func (r *AppStruct) Bootstrap() error {
 
 	r.Events.MustTrigger("bindMiddlewares", event.M{"app": r})
 	r.Events.MustTrigger("bindRoutes", event.M{"app": r})
-	r.Events.MustTrigger("setResponseFormats", event.M{"app": r})
 	r.Events.MustTrigger("setTemplateFunctions", event.M{"app": r})
 
 	logrus.WithFields(logrus.Fields{
@@ -350,7 +380,7 @@ func (r *AppStruct) InitDatabase(name, engine string, isDefault bool) error {
 	var err error
 	var db *gorm.DB
 
-	dbURI := r.Configuration.GetF("DB_URI", "test.sqlite?charset=utf8mb4")
+	dbURI := r.Configuration.GetF("DB_URI", "file::memory:?charset=utf8mb4")
 	dbSlowThreshold := r.Configuration.GetInt64F("DB_SLOW_THRESHOLD", 400)
 	logQuery := r.Configuration.GetF("LOG_QUERY", "")
 
@@ -448,17 +478,17 @@ func (r *AppStruct) Can(permission string, userRoles []string) bool {
 }
 
 func (r *AppStruct) SetRole(name string, role acl.Role) error {
-	r.RolesList[name] = role
+	r.RolesList[name] = &role
 	return nil
 }
 
-func (r *AppStruct) GetRoles() map[string]acl.Role {
+func (r *AppStruct) GetRoles() map[string]*acl.Role {
 	return r.RolesList
 }
 
 func (r *AppStruct) GetRole(name string) *acl.Role {
 	if v, ok := r.RolesList[name]; ok {
-		return &v
+		return v
 	}
 
 	return nil
@@ -533,7 +563,7 @@ func (r *AppStruct) Close() error {
 	return nil
 }
 
-func newApp(options *AppOptions) App {
+func NewApp(options *AppOptions) App {
 	cfg := configuration.NewCfg()
 	logger.Init()
 
@@ -553,18 +583,22 @@ func newApp(options *AppOptions) App {
 	app.router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cc := &RequestContext{
-				EchoContext: c,
+				echoContext: c,
 			}
 			return next(cc)
 		}
 	})
+	// Default police:
+	app.sanitizer = bluemonday.UGCPolicy()
+	app.sanitizer.AllowDataURIImages()
 
 	app.router.Binder = &CustomBinder{}
-	app.router.HTTPErrorHandler = CustomHTTPErrorHandler
+	app.router.HTTPErrorHandler = CustomHTTPErrorHandler(&app)
 	app.router.Validator = &helpers.CustomValidator{Validator: validator.New()}
 
 	app.router.GET("/health", HealthCheckHandler)
 	app.Plugins = make(map[string]Pluginer)
+	app.RegisterPlugin(&Plugin{Name: "bolo"})
 
 	app.Models = make(map[string]interface{})
 

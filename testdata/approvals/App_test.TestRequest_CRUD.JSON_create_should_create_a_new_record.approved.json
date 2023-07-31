@@ -1,0 +1,10 @@
+{
+  "url": {
+    "createdAt": "2023-07-16T00:00:00Z",
+    "creatorId": null,
+    "id": 3,
+    "path": "http://www.example.com",
+    "title": "example",
+    "updatedAt": "2023-07-16T00:00:00Z"
+  }
+}

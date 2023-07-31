@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Core plugin
 type Plugin struct {
 	Name string
 }

@@ -62,7 +62,6 @@ func (r *Role) RemovePermission(permission string) {
 			return
 		}
 	}
-
 }
 
 func LoadRoles() (string, error) {
@@ -97,15 +96,4 @@ var defaultRoles = `{
 		"name": "owner",
 		"permissions": [],
 		"isSystemRole": true
-	},
-	"premium": {
-		"name": "premium",
-		"permissions": [],
-		"canAddInUsers": true,
-		"isSystemRole": false
-	},
-	"blog_editor": {
-		"name": "blog_editor",
-		"canAddInUsers": false,
-		"permissions": []
 	}}`

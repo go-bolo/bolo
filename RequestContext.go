@@ -21,11 +21,18 @@ import (
 )
 
 type RequestContextOpts struct {
+	App         App
 	EchoContext echo.Context
 }
 
 func NewRequestContext(opts *RequestContextOpts) *RequestContext {
-	app := GetApp()
+	var app App
+	if opts.App != nil {
+		app = opts.App
+	} else {
+		app = GetApp()
+	}
+
 	cfg := app.GetConfiguration()
 	port := cfg.GetF("PORT", "8080")
 	protocol := cfg.GetF("PROTOCOL", "http")
@@ -33,7 +40,7 @@ func NewRequestContext(opts *RequestContextOpts) *RequestContext {
 
 	ctx := RequestContext{
 		App:         app,
-		EchoContext: opts.EchoContext,
+		echoContext: opts.EchoContext,
 		Protocol:    protocol,
 		Domain:      domain,
 		AppOrigin:   cfg.GetF("APP_ORIGIN", protocol+"://"+domain+":"+port),
@@ -96,7 +103,7 @@ func NewRequestContext(opts *RequestContextOpts) *RequestContext {
 }
 
 type RequestContext struct {
-	EchoContext echo.Context
+	echoContext echo.Context
 	App         App
 
 	Protocol  string
@@ -126,270 +133,270 @@ type RequestContext struct {
 
 // Request returns `*http.Request`.
 func (c *RequestContext) Request() *http.Request {
-	return c.EchoContext.Request()
+	return c.echoContext.Request()
 }
 
 // SetRequest sets `*http.Request`.
 func (c *RequestContext) SetRequest(r *http.Request) {
-	c.EchoContext.SetRequest(r)
+	c.echoContext.SetRequest(r)
 }
 
 // SetResponse sets `*Response`.
 func (c *RequestContext) SetResponse(r *echo.Response) {
-	c.EchoContext.SetResponse(r)
+	c.echoContext.SetResponse(r)
 }
 
 // Response returns `*Response`.
 func (c *RequestContext) Response() *echo.Response {
-	return c.EchoContext.Response()
+	return c.echoContext.Response()
 }
 
 // IsTLS returns true if HTTP connection is TLS otherwise false.
 func (c *RequestContext) IsTLS() bool {
-	return c.EchoContext.IsTLS()
+	return c.echoContext.IsTLS()
 }
 
 // IsWebSocket returns true if HTTP connection is WebSocket otherwise false.
 func (c *RequestContext) IsWebSocket() bool {
-	return c.EchoContext.IsWebSocket()
+	return c.echoContext.IsWebSocket()
 }
 
 // Scheme returns the HTTP protocol scheme, `http` or `https`.
 func (c *RequestContext) Scheme() string {
-	return c.EchoContext.Scheme()
+	return c.echoContext.Scheme()
 }
 
 // RealIP returns the client's network address based on `X-Forwarded-For`
 // or `X-Real-IP` request header.
 // The behavior can be configured using `Echo#IPExtractor`.
 func (c *RequestContext) RealIP() string {
-	return c.EchoContext.RealIP()
+	return c.echoContext.RealIP()
 }
 
 // Path returns the registered path for the handler.
 func (c *RequestContext) Path() string {
-	return c.EchoContext.Path()
+	return c.echoContext.Path()
 }
 
 // SetPath sets the registered path for the handler.
 func (c *RequestContext) SetPath(p string) {
-	c.EchoContext.SetPath(p)
+	c.echoContext.SetPath(p)
 }
 
 // Param returns path parameter by name.
 func (c *RequestContext) Param(name string) string {
-	return c.EchoContext.Param(name)
+	return c.echoContext.Param(name)
 }
 
 // ParamNames returns path parameter names.
 func (c *RequestContext) ParamNames() []string {
-	return c.EchoContext.ParamNames()
+	return c.echoContext.ParamNames()
 }
 
 // SetParamNames sets path parameter names.
 func (c *RequestContext) SetParamNames(names ...string) {
-	c.EchoContext.SetParamNames(names...)
+	c.echoContext.SetParamNames(names...)
 }
 
 // ParamValues returns path parameter values.
 func (c *RequestContext) ParamValues() []string {
-	return c.EchoContext.ParamValues()
+	return c.echoContext.ParamValues()
 }
 
 // SetParamValues sets path parameter values.
 func (c *RequestContext) SetParamValues(values ...string) {
-	c.EchoContext.SetParamValues(values...)
+	c.echoContext.SetParamValues(values...)
 }
 
 // QueryParam returns the query param for the provided name.
 func (c *RequestContext) QueryParam(name string) string {
-	return c.EchoContext.QueryParam(name)
+	return c.echoContext.QueryParam(name)
 }
 
 // QueryParams returns the query parameters as `url.Values`.
 func (c *RequestContext) QueryParams() url.Values {
-	return c.EchoContext.QueryParams()
+	return c.echoContext.QueryParams()
 }
 
 // QueryString returns the URL query string.
 func (c *RequestContext) QueryString() string {
-	return c.EchoContext.QueryString()
+	return c.echoContext.QueryString()
 }
 
 // FormValue returns the form field value for the provided name.
 func (c *RequestContext) FormValue(name string) string {
-	return c.EchoContext.FormValue(name)
+	return c.echoContext.FormValue(name)
 }
 
 // FormParams returns the form parameters as `url.Values`.
 func (c *RequestContext) FormParams() (url.Values, error) {
-	return c.EchoContext.FormParams()
+	return c.echoContext.FormParams()
 }
 
 // FormFile returns the multipart form file for the provided name.
 func (c *RequestContext) FormFile(name string) (*multipart.FileHeader, error) {
-	return c.EchoContext.FormFile(name)
+	return c.echoContext.FormFile(name)
 }
 
 // MultipartForm returns the multipart form.
 func (c *RequestContext) MultipartForm() (*multipart.Form, error) {
-	return c.EchoContext.MultipartForm()
+	return c.echoContext.MultipartForm()
 }
 
 // Cookie returns the named cookie provided in the request.
 func (c *RequestContext) Cookie(name string) (*http.Cookie, error) {
-	return c.EchoContext.Cookie(name)
+	return c.echoContext.Cookie(name)
 }
 
 // SetCookie adds a `Set-Cookie` header in HTTP response.
 func (c *RequestContext) SetCookie(cookie *http.Cookie) {
-	c.EchoContext.SetCookie(cookie)
+	c.echoContext.SetCookie(cookie)
 }
 
 // Cookies returns the HTTP cookies sent with the request.
 func (c *RequestContext) Cookies() []*http.Cookie {
-	return c.EchoContext.Cookies()
+	return c.echoContext.Cookies()
 }
 
 // Bind binds the request body into provided type `i`. The default binder
 // does it based on Content-Type header.
 func (c *RequestContext) Bind(i interface{}) error {
-	return c.EchoContext.Bind(i)
+	return c.echoContext.Bind(i)
 }
 
 // Validate validates provided `i`. It is usually called after `Context#Bind()`.
 // Validator must be registered using `Echo#Validator`.
 func (c *RequestContext) Validate(i interface{}) error {
-	return c.EchoContext.Validate(i)
+	return c.echoContext.Validate(i)
 }
 
 // Render renders a template with data and sends a text/html response with status
 // code. Renderer must be registered using `Echo.Renderer`.
 func (c *RequestContext) Render(code int, name string, data interface{}) error {
-	return c.EchoContext.Render(code, name, data)
+	return c.echoContext.Render(code, name, data)
 }
 
 // HTML sends an HTTP response with status code.
 func (c *RequestContext) HTML(code int, html string) error {
-	return c.EchoContext.HTML(code, html)
+	return c.echoContext.HTML(code, html)
 }
 
 // HTMLBlob sends an HTTP blob response with status code.
 func (c *RequestContext) HTMLBlob(code int, b []byte) error {
-	return c.EchoContext.HTMLBlob(code, b)
+	return c.echoContext.HTMLBlob(code, b)
 }
 
 // String sends a string response with status code.
 func (c *RequestContext) String(code int, s string) error {
-	return c.EchoContext.String(code, s)
+	return c.echoContext.String(code, s)
 }
 
 // JSON sends a JSON response with status code.
 func (c *RequestContext) JSON(code int, i interface{}) error {
-	return c.EchoContext.JSON(code, i)
+	return c.echoContext.JSON(code, i)
 }
 
 // JSONPretty sends a pretty-print JSON with status code.
 func (c *RequestContext) JSONPretty(code int, i interface{}, indent string) error {
-	return c.EchoContext.JSONPretty(code, i, indent)
+	return c.echoContext.JSONPretty(code, i, indent)
 }
 
 // JSONBlob sends a JSON blob response with status code.
 func (c *RequestContext) JSONBlob(code int, b []byte) error {
-	return c.EchoContext.JSONBlob(code, b)
+	return c.echoContext.JSONBlob(code, b)
 }
 
 // JSONP sends a JSONP response with status code. It uses `callback` to construct
 // the JSONP payload.
 func (c *RequestContext) JSONP(code int, callback string, i interface{}) error {
-	return c.EchoContext.JSONP(code, callback, i)
+	return c.echoContext.JSONP(code, callback, i)
 }
 
 // JSONPBlob sends a JSONP blob response with status code. It uses `callback`
 // to construct the JSONP payload.
 func (c *RequestContext) JSONPBlob(code int, callback string, b []byte) error {
-	return c.EchoContext.JSONPBlob(code, callback, b)
+	return c.echoContext.JSONPBlob(code, callback, b)
 }
 
 // XML sends an XML response with status code.
 func (c *RequestContext) XML(code int, i interface{}) error {
-	return c.EchoContext.XML(code, i)
+	return c.echoContext.XML(code, i)
 }
 
 // XMLPretty sends a pretty-print XML with status code.
 func (c *RequestContext) XMLPretty(code int, i interface{}, indent string) error {
-	return c.EchoContext.XMLPretty(code, i, indent)
+	return c.echoContext.XMLPretty(code, i, indent)
 }
 
 // XMLBlob sends an XML blob response with status code.
 func (c *RequestContext) XMLBlob(code int, b []byte) error {
-	return c.EchoContext.XMLBlob(code, b)
+	return c.echoContext.XMLBlob(code, b)
 }
 
 // Blob sends a blob response with status code and content type.
 func (c *RequestContext) Blob(code int, contentType string, b []byte) error {
-	return c.EchoContext.Blob(code, contentType, b)
+	return c.echoContext.Blob(code, contentType, b)
 }
 
 // Stream sends a streaming response with status code and content type.
 func (c *RequestContext) Stream(code int, contentType string, r io.Reader) error {
-	return c.EchoContext.Stream(code, contentType, r)
+	return c.echoContext.Stream(code, contentType, r)
 }
 
 // File sends a response with the content of the file.
 func (c *RequestContext) File(file string) error {
-	return c.EchoContext.File(file)
+	return c.echoContext.File(file)
 }
 
 // Attachment sends a response as attachment, prompting client to save the
 // file.
 func (c *RequestContext) Attachment(file string, name string) error {
-	return c.EchoContext.Attachment(file, name)
+	return c.echoContext.Attachment(file, name)
 }
 
 // Inline sends a response as inline, opening the file in the browser.
 func (c *RequestContext) Inline(file string, name string) error {
-	return c.EchoContext.Inline(file, name)
+	return c.echoContext.Inline(file, name)
 }
 
 // NoContent sends a response with no body and a status code.
 func (c *RequestContext) NoContent(code int) error {
-	return c.EchoContext.NoContent(code)
+	return c.echoContext.NoContent(code)
 }
 
 // Redirect redirects the request to a provided URL with status code.
 func (c *RequestContext) Redirect(code int, url string) error {
-	return c.EchoContext.Redirect(code, url)
+	return c.echoContext.Redirect(code, url)
 }
 
 // Error invokes the registered HTTP error handler. Generally used by middleware.
 func (c *RequestContext) Error(err error) {
-	c.EchoContext.Error(err)
+	c.echoContext.Error(err)
 }
 
 // Handler returns the matched handler by router.
 func (c *RequestContext) Handler() echo.HandlerFunc {
-	return c.EchoContext.Handler()
+	return c.echoContext.Handler()
 }
 
 // SetHandler sets the matched handler by router.
 func (c *RequestContext) SetHandler(h echo.HandlerFunc) {
-	c.EchoContext.SetHandler(h)
+	c.echoContext.SetHandler(h)
 }
 
 // Logger returns the `Logger` instance.
 func (c *RequestContext) Logger() echo.Logger {
-	return c.EchoContext.Logger()
+	return c.echoContext.Logger()
 }
 
 // Set the logger
 func (c *RequestContext) SetLogger(l echo.Logger) {
-	c.EchoContext.SetLogger(l)
+	c.echoContext.SetLogger(l)
 }
 
 // Echo returns the `Echo` instance.
 func (c *RequestContext) Echo() *echo.Echo {
-	return c.EchoContext.Echo()
+	return c.echoContext.Echo()
 }
 
 /// --- END echo.Context overrides
@@ -398,7 +405,7 @@ func (c *RequestContext) Echo() *echo.Echo {
 // with `Echo#AcquireContext()` and `Echo#ReleaseContext()`.
 // See `Echo#ServeHTTP()`
 func (c *RequestContext) Reset(r *http.Request, w http.ResponseWriter) {
-	c.EchoContext.Reset(r, w)
+	c.echoContext.Reset(r, w)
 }
 
 type SessionData struct {
@@ -406,15 +413,15 @@ type SessionData struct {
 }
 
 func (r *RequestContext) Set(name string, value interface{}) {
-	r.EchoContext.Set(name, value)
+	r.echoContext.Set(name, value)
 }
 
 func (r *RequestContext) Get(name string) interface{} {
-	return r.EchoContext.Get(name)
+	return r.echoContext.Get(name)
 }
 
 func (r *RequestContext) GetString(name string) string {
-	v := r.EchoContext.Get(name)
+	v := r.echoContext.Get(name)
 	if v == nil {
 		return ""
 	}
