@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// TODO! remove that global app:
 var appInstance App
 
 func init() {
@@ -21,7 +22,6 @@ func Init(options *AppOptions) App {
 
 	InitSanitizer()
 
-	appInstance.RegisterPlugin(&Plugin{Name: "catu"})
 	return appInstance
 }
 

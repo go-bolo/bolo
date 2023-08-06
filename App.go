@@ -37,13 +37,16 @@ import (
 
 type App interface {
 	RegisterPlugin(p Pluginer)
-	GetPlugins() map[string]Pluginer
+	GetPlugins() []Pluginer
 	GetPlugin(name string) Pluginer
 	SetPlugin(name string, plugin Pluginer) error
 
 	GetClock() clock.Clock
 	SetClock(clock clock.Clock) error
 
+	GetDefaultContentType() string
+	GetContentTypes() []string
+	SetContentTypes(contentTypes []string) error
 	GetRouter() *echo.Echo
 	SetRouterGroup(name, path string) *echo.Group
 	GetRouterGroup(name string) *echo.Group
@@ -91,6 +94,9 @@ type App interface {
 }
 
 type AppOptions struct {
+	DefaultContentType string
+	// Avaiblable content types for negotiation:
+	ContentTypes []string
 	// Gorm configurations / options
 	GormOptions gorm.Option
 }
@@ -110,7 +116,7 @@ type AppStruct struct {
 	// avaible databases
 	DBs map[string]*gorm.DB `json:"-"`
 
-	Plugins map[string]Pluginer
+	Plugins []Pluginer
 
 	Models map[string]interface{}
 
@@ -145,19 +151,25 @@ func (r *AppStruct) RegisterPlugin(p Pluginer) {
 		panic("Plugin.RegisterPlugin Name should be returned from GetName method")
 	}
 
-	r.Plugins[p.GetName()] = p
+	r.SetPlugin(p.GetName(), p)
 }
 
 func (r *AppStruct) GetPlugin(name string) Pluginer {
-	return r.Plugins[name]
-}
+	for _, p := range r.Plugins {
+		if p.GetName() == name {
+			return p
+		}
+	}
 
-func (r *AppStruct) SetPlugin(name string, plugin Pluginer) error {
-	r.Plugins[name] = plugin
 	return nil
 }
 
-func (r *AppStruct) GetPlugins() map[string]Pluginer {
+func (r *AppStruct) SetPlugin(name string, plugin Pluginer) error {
+	r.Plugins = append(r.Plugins, plugin)
+	return nil
+}
+
+func (r *AppStruct) GetPlugins() []Pluginer {
 	return r.Plugins
 }
 
@@ -167,6 +179,23 @@ func (app *AppStruct) GetClock() clock.Clock {
 
 func (app *AppStruct) SetClock(clock clock.Clock) error {
 	app.clock = clock
+	return nil
+}
+
+func (app *AppStruct) GetDefaultContentType() string {
+	if app.Options.DefaultContentType != "" {
+		return app.Options.DefaultContentType
+	}
+
+	return "application/json"
+}
+
+func (app *AppStruct) GetContentTypes() []string {
+	return app.Options.ContentTypes
+}
+
+func (app *AppStruct) SetContentTypes(contentTypes []string) error {
+	app.Options.ContentTypes = contentTypes
 	return nil
 }
 
@@ -567,6 +596,14 @@ func NewApp(options *AppOptions) App {
 	cfg := configuration.NewCfg()
 	logger.Init()
 
+	if len(options.ContentTypes) == 0 {
+		options.ContentTypes = []string{"text/html", "application/json"}
+	}
+
+	if options.DefaultContentType == "" {
+		options.DefaultContentType = "application/json"
+	}
+
 	app := AppStruct{
 		Options:       options,
 		Theme:         cfg.GetF("THEME", "site"),
@@ -597,8 +634,7 @@ func NewApp(options *AppOptions) App {
 	app.router.Validator = &helpers.CustomValidator{Validator: validator.New()}
 
 	app.router.GET("/health", HealthCheckHandler)
-	app.Plugins = make(map[string]Pluginer)
-	app.RegisterPlugin(&Plugin{Name: "bolo"})
+	app.Plugins = []Pluginer{}
 
 	app.Models = make(map[string]interface{})
 
@@ -611,6 +647,8 @@ func NewApp(options *AppOptions) App {
 	apiRouterGroup.GET("", HealthCheckHandler)
 
 	app.templateFunctions = sprig.FuncMap()
+
+	app.RegisterPlugin(&Plugin{Name: "bolo"})
 
 	return &app
 }

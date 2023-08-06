@@ -25,9 +25,10 @@ func BindMiddlewares(app App, p *Plugin) {
 		AllowCredentials: app.GetConfiguration().GetBoolF("CORS_ALLOW_CREDENTIALS", true),
 		MaxAge:           app.GetConfiguration().GetIntF("CORS_MAX_AGE", 18000), // seccounds
 	}))
-	router.Use(initAppCtx(app))
 
-	if goEnv == "dev" {
+	router.Pre(initAppCtx(app))
+
+	if goEnv == "development" {
 		router.Debug = true
 	}
 }
@@ -42,6 +43,17 @@ func initAppCtx(app App) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			ctx := NewRequestContext(&RequestContextOpts{App: app, EchoContext: c})
 			return next(ctx)
+		}
+	}
+}
+
+func AcceptResolverMiddleware(app App) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			acceptType := NegotiateContentType(c.Request(), app.GetContentTypes(), app.GetDefaultContentType())
+			c.Set("responseContentType", acceptType)
+
+			return next(c)
 		}
 	}
 }
