@@ -26,7 +26,7 @@ func BindMiddlewares(app App, p *Plugin) {
 		MaxAge:           app.GetConfiguration().GetIntF("CORS_MAX_AGE", 18000), // seccounds
 	}))
 
-	router.Pre(initAppCtx(app))
+	router.Use(initAppCtx(app))
 
 	if goEnv == "development" {
 		router.Debug = true
@@ -47,7 +47,7 @@ func initAppCtx(app App) echo.MiddlewareFunc {
 	}
 }
 
-func AcceptResolverMiddleware(app App) echo.MiddlewareFunc {
+func acceptResolverMiddleware(app App) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			acceptType := NegotiateContentType(c.Request(), app.GetContentTypes(), app.GetDefaultContentType())

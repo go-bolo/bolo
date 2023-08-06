@@ -17,7 +17,7 @@ func (p *Plugin) Init(a App) error {
 
 	a.GetEvents().On("bindMiddlewares", event.ListenerFunc(func(e event.Event) error {
 		return p.BindMiddlewares(a)
-	}), event.Normal)
+	}), event.High)
 
 	a.GetEvents().On("setTemplateFunctions", event.ListenerFunc(func(e event.Event) error {
 		return p.setTemplateFunctions(a)
