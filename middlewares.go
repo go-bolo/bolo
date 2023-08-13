@@ -24,7 +24,14 @@ func BindMiddlewares(app App, p *Plugin) {
 	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowCredentials: app.GetConfiguration().GetBoolF("CORS_ALLOW_CREDENTIALS", true),
 		MaxAge:           app.GetConfiguration().GetIntF("CORS_MAX_AGE", 18000), // seccounds
+		AllowOriginFunc: func(origin string) (bool, error) {
+			return true, nil
+		},
 	}))
+
+	router.Use(acceptResolverMiddleware(app))
+
+	// Access-Control-Allow-Credentials
 
 	router.Use(initAppCtx(app))
 
