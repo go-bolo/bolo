@@ -43,6 +43,7 @@ func (p *Plugin) setTemplateFunctions(app App) error {
 	app.SetTemplateFunction("formatDecimalWithDots", formatDecimalWithDots)
 	app.SetTemplateFunction("html", noEscapeHTML)
 	app.SetTemplateFunction("currentDate", currentDate)
+	app.SetTemplateFunction("renderResponseMessages", renderResponseMessages)
 
 	return nil
 }
