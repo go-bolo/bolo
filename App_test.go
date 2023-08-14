@@ -9,7 +9,7 @@ import (
 
 	approvals "github.com/approvals/go-approval-tests"
 	"github.com/go-bolo/bolo"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
