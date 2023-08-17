@@ -1,7 +1,7 @@
 module github.com/go-bolo/bolo
 
 go 1.20
-
+ 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/approvals/go-approval-tests v0.0.0-20220530063708-32d5677069bd
