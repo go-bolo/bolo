@@ -126,7 +126,14 @@ type RequestContext struct {
 	Query     query_parser_to_db.QueryInterface
 	Pager     *pagination.Pager
 
+	responseMessages []*ResponseMessage
+
 	ENV string
+}
+
+type ResponseMessage struct {
+	Message string
+	Type    string
 }
 
 /// --- Start echo.Context overrides
@@ -509,7 +516,9 @@ func (r *RequestContext) GetBodyClassText() string {
 func (r *RequestContext) GetResponseContentType() string {
 	v := r.GetString("responseContentType")
 	if v == "" {
-		return r.Request().Header.Get(echo.HeaderContentType) // default ...
+		app := r.Get("app").(App)
+		acceptType := NegotiateContentType(r.Request(), app.GetContentTypes(), app.GetDefaultContentType())
+		return acceptType
 	}
 
 	return v
@@ -566,6 +575,15 @@ func (r *RequestContext) SetAuthenticatedUserAndFillRoles(user UserInterface) {
 func (r *RequestContext) Can(permission string) bool {
 	roles := r.GetAuthenticatedRoles()
 	return r.App.Can(permission, *roles)
+}
+
+func (r *RequestContext) GetResponseMessages() []*ResponseMessage {
+	return r.responseMessages
+}
+
+func (r *RequestContext) AddResponseMessage(msg *ResponseMessage) error {
+	r.responseMessages = append(r.responseMessages, msg)
+	return nil
 }
 
 func GetQueryIntFromReq(param string, c echo.Context) int {

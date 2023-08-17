@@ -1,6 +1,11 @@
 {
   "InitTime": "0001-01-01T00:00:00Z",
   "Options": {
+    "DefaultContentType": "application/json",
+    "ContentTypes": [
+      "text/html",
+      "application/json"
+    ],
     "GormOptions": null
   },
   "Events": {
@@ -10,11 +15,11 @@
     "MatchMode": 0
   },
   "Configuration": {},
-  "Plugins": {
-    "bolo": {
+  "Plugins": [
+    {
       "Name": "bolo"
     }
-  },
+  ],
   "Models": {},
   "Resources": {},
   "RolesString": "{\n\t\"administrator\": {\n\t\t\"name\": \"administrator\",\n\t\t\"permissions\": [],\n\t\t\"canAddInUsers\": true,\n\t\t\"isSystemRole\": true\n\t},\n\t\"authenticated\": {\n\t\t\"name\": \"authenticated\",\n\t\t\"permissions\": [],\n\t\t\"isSystemRole\": true\n\t},\n\t\"unAuthenticated\": {\n\t\t\"name\": \"unAuthenticated\",\n\t\t\"permissions\": [],\n\t\t\"isSystemRole\": true\n\t},\n\t\"owner\": {\n\t\t\"name\": \"owner\",\n\t\t\"permissions\": [],\n\t\t\"isSystemRole\": true\n\t}}",
