@@ -66,6 +66,9 @@ type App interface {
 	SetTemplateFunction(name string, f interface{})
 	RenderTemplate(wr io.Writer, name string, data interface{}) error
 
+	SetResponseFormatter(format string, rf ResponseFormatter) error
+	GetResponseFormatter(format string) (ResponseFormatter, error)
+
 	InitDatabase(name, engine string, isDefault bool) error
 	SetModel(name string, f interface{})
 	GetModel(name string) interface{}

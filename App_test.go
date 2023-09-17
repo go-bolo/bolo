@@ -134,6 +134,15 @@ func TestRequest_CRUD(t *testing.T) {
 			expectedStatus: http.StatusNotFound,
 		},
 		{
+			name: "HTML: JSON findOne should return 404 with invalid id",
+			args: args{
+				method: http.MethodGet,
+				url:    "/urls/1111111111",
+				accept: "text/html",
+			},
+			expectedStatus: http.StatusNotFound,
+		},
+		{
 			name: "JSON create should create a new record",
 			args: args{
 				method: http.MethodPost,

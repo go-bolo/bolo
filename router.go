@@ -99,3 +99,8 @@ func Redirect(c echo.Context, code int, url string) (Response, error) {
 
 	return nil, nil
 }
+
+func Send(ctx *RequestContext, resp Response) error {
+
+	return nil
+}
