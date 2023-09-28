@@ -15,14 +15,23 @@ import (
 
 var m *minify.M
 
-func init() {
+func setupMinifier(app App) {
 	m = minify.New()
-	m.AddFunc("text/html", html.Minify)
-	m.AddFunc("text/css", css.Minify)
-	m.AddFunc("text/html", html.Minify)
-	m.AddFunc("image/svg+xml", svg.Minify)
-	m.AddFuncRegexp(regexp.MustCompile("^(application|text)/(x-)?(java|ecma)script$"), js.Minify)
-	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+	if app.GetConfiguration().GetBoolF("MINIFY_HTML", true) {
+		m.AddFunc("text/html", html.Minify)
+	}
+	if app.GetConfiguration().GetBoolF("MINIFY_CSS", true) {
+		m.AddFunc("text/css", css.Minify)
+	}
+	if app.GetConfiguration().GetBoolF("MINIFY_IMAGE", true) {
+		m.AddFunc("image/svg+xml", svg.Minify)
+	}
+	if app.GetConfiguration().GetBoolF("MINIFY_JS", false) {
+		m.AddFuncRegexp(regexp.MustCompile("^(application|text)/(x-)?(java|ecma)script$"), js.Minify)
+	}
+	if app.GetConfiguration().GetBoolF("MINIFY_JSON", true) {
+		m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+	}
 }
 
 func MinifiHTML(templateName string, data interface{}, c *RequestContext) (string, error) {
