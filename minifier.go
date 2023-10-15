@@ -26,6 +26,7 @@ func setupMinifier(app App) {
 	if app.GetConfiguration().GetBoolF("MINIFY_IMAGE", true) {
 		m.AddFunc("image/svg+xml", svg.Minify)
 	}
+	// minify js is disabled by default because may fails on some new js expressions like a JSON directly inside a script as component:
 	if app.GetConfiguration().GetBoolF("MINIFY_JS", false) {
 		m.AddFuncRegexp(regexp.MustCompile("^(application|text)/(x-)?(java|ecma)script$"), js.Minify)
 	}
