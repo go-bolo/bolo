@@ -115,7 +115,7 @@ func CustomHTTPErrorHandler(app App) func(err error, c echo.Context) {
 			}
 		}
 
-		if ve, ok := err.(validator.ValidationErrors); ok || code == http.StatusUnprocessableEntity {
+		if ve, ok := err.(validator.ValidationErrors); ok {
 			validationError(ve, err, ctx)
 			return
 		}
@@ -125,6 +125,8 @@ func CustomHTTPErrorHandler(app App) func(err error, c echo.Context) {
 		}
 
 		switch code {
+		case 400, 422:
+			badRequestErrorHandler(err, ctx)
 		case 401:
 			unAuthorizedErrorHandler(err, ctx)
 		case 403:
@@ -179,6 +181,39 @@ func forbiddenErrorHandler(err error, c echo.Context) error {
 		return nil
 	default:
 		c.JSON(http.StatusForbidden, err)
+		return nil
+	}
+}
+
+func badRequestErrorHandler(err error, ctx *RequestContext) error {
+	status := http.StatusBadRequest
+	if ctx.Get("status") != nil {
+		status = ctx.Get("status").(int)
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"err":  fmt.Sprintf("%+v\n", err),
+		"code": status,
+	}).Debug("bolo.badRequestErrorHandler running")
+
+	switch ctx.GetResponseContentType() {
+	case "text/html":
+		ctx.Title = "Bad request"
+
+		template := "400"
+		if ctx.Get("template") != nil {
+			template = ctx.Get("template").(string)
+		}
+
+		if err := ctx.Render(status, template, &TemplateCTX{
+			Ctx: ctx,
+		}); err != nil {
+			ctx.Logger().Error(err)
+		}
+
+		return nil
+	default:
+		ctx.JSON(http.StatusBadRequest, err)
 		return nil
 	}
 }
