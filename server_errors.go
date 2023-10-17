@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -87,12 +88,22 @@ func CustomHTTPErrorHandler(app App) func(err error, c echo.Context) {
 			ctx = NewRequestContext(&RequestContextOpts{App: app, EchoContext: c})
 		}
 
+		app.GetEvents().Trigger("http-error", map[string]any{
+			"error":       err,
+			"echoContext": c,
+		})
+
 		code := 0
 		if he, ok := err.(HTTPErrorInterface); ok {
 			code = he.GetCode()
 			if ctx.GetResponseContentType() == "application/json" {
 				c.JSON(code, he)
 				return
+			}
+		} else {
+			switch c.Get("status").(type) {
+			case string:
+				code, _ = strconv.Atoi(c.Get("status").(string))
 			}
 		}
 
@@ -114,6 +125,8 @@ func CustomHTTPErrorHandler(app App) func(err error, c echo.Context) {
 		}
 
 		switch code {
+		case 400, 422:
+			badRequestErrorHandler(err, ctx)
 		case 401:
 			unAuthorizedErrorHandler(err, ctx)
 		case 403:
@@ -172,6 +185,39 @@ func forbiddenErrorHandler(err error, c echo.Context) error {
 	}
 }
 
+func badRequestErrorHandler(err error, ctx *RequestContext) error {
+	status := http.StatusBadRequest
+	if ctx.Get("status") != nil {
+		status = ctx.Get("status").(int)
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"err":  fmt.Sprintf("%+v\n", err),
+		"code": status,
+	}).Debug("bolo.badRequestErrorHandler running")
+
+	switch ctx.GetResponseContentType() {
+	case "text/html":
+		ctx.Title = "Bad request"
+
+		template := "400"
+		if ctx.Get("template") != nil {
+			template = ctx.Get("template").(string)
+		}
+
+		if err := ctx.Render(status, template, &TemplateCTX{
+			Ctx: ctx,
+		}); err != nil {
+			ctx.Logger().Error(err)
+		}
+
+		return nil
+	default:
+		ctx.JSON(http.StatusBadRequest, err)
+		return nil
+	}
+}
+
 func unAuthorizedErrorHandler(err error, ctx *RequestContext) error {
 	logrus.WithFields(logrus.Fields{
 		"err":               fmt.Sprintf("%+v\n", err),
@@ -223,9 +269,14 @@ func notFoundErrorHandler(err error, ctx *RequestContext) error {
 }
 
 func validationError(ve validator.ValidationErrors, err error, ctx *RequestContext) error {
+	status := http.StatusUnprocessableEntity
+	if ctx.Get("status") != nil {
+		status = ctx.Get("status").(int)
+	}
+
 	logrus.WithFields(logrus.Fields{
 		"err":  fmt.Sprintf("%+v\n", err),
-		"code": "400",
+		"code": status,
 	}).Debug("bolo.validationError running")
 
 	resp := ValidationResponse{}
@@ -243,9 +294,16 @@ func validationError(ve validator.ValidationErrors, err error, ctx *RequestConte
 
 	switch ctx.GetResponseContentType() {
 	case "text/html":
-		ctx.Title = "Bad request"
+		if ctx.Title != "" {
+			ctx.Title = "Bad request"
+		}
 
-		if err := ctx.Render(http.StatusInternalServerError, "400", &TemplateCTX{
+		template := "400"
+		if ctx.Get("template") != nil {
+			template = ctx.Get("template").(string)
+		}
+
+		if err := ctx.Render(status, template, &TemplateCTX{
 			Ctx: ctx,
 		}); err != nil {
 			ctx.Logger().Error(err)
@@ -253,7 +311,7 @@ func validationError(ve validator.ValidationErrors, err error, ctx *RequestConte
 
 		return nil
 	default:
-		return ctx.JSON(http.StatusBadRequest, resp)
+		return ctx.JSON(status, resp)
 	}
 }
 
