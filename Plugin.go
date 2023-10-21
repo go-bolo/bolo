@@ -48,6 +48,10 @@ func (p *Plugin) setTemplateFunctions(app App) error {
 	return nil
 }
 
+func (p *Plugin) GetMigrations() []*Migration {
+	return []*Migration{}
+}
+
 func (p *Plugin) SetTemplateFuncMap(app App) error {
 	return nil
 }
