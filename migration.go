@@ -145,6 +145,15 @@ func Up(app App) error {
 	}
 
 	for _, plugin := range plugins {
+		defer func() {
+			if r := recover(); r != nil {
+				logrus.WithFields(logrus.Fields{
+					"pluginName": plugin.GetName(),
+					"error":      r,
+				}).Error("Recovered from a error on run migration migration")
+			}
+		}()
+
 		migs := plugin.GetMigrations()
 
 		logrus.WithFields(logrus.Fields{
@@ -181,6 +190,7 @@ func Up(app App) error {
 			}).Debug("Mig:")
 
 			if !lastVersionRan.Installed || lastMigRan != nil {
+
 				err := mig.Up(app)
 				if err != nil {
 					lastVersionRan.LastUpgradeName = mig.Name
