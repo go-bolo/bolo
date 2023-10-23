@@ -84,7 +84,6 @@ type MigrationModel struct {
 	PluginName      string    `gorm:"column:plugin_name;primaryKey;type:varchar(200)"`
 	Version         int       `gorm:"column:version"`
 	LastUpgradeName string    `gorm:"column:last_upgrade_name"`
-	Installed       bool      `gorm:"column:installed;default:false;not null"`
 	CreatedAt       time.Time `gorm:"column:created_at;default:NOW();not null"`
 	UpdatedAt       time.Time `gorm:"column:updated_at;default:NOW();not null"`
 	LastError       string    `gorm:"column:last_error;type:TEXT"`
@@ -173,7 +172,6 @@ func Up(app App) error {
 			lastVersionRan = &MigrationModel{
 				PluginName:      plugin.GetName(),
 				Version:         0,
-				Installed:       false,
 				LastUpgradeName: migs[0].Name,
 				UpdatedAt:       time.Now(),
 				CreatedAt:       time.Now(),
@@ -189,8 +187,7 @@ func Up(app App) error {
 				"version":         v,
 			}).Debug("Mig:")
 
-			if !lastVersionRan.Installed || lastMigRan != nil {
-
+			if lastVersionRan.Version == 0 || lastMigRan != nil {
 				err := mig.Up(app)
 				if err != nil {
 					lastVersionRan.LastUpgradeName = mig.Name
@@ -202,7 +199,6 @@ func Up(app App) error {
 					return fmt.Errorf("error on run migration up %s: %w", mig.Name, err)
 				}
 
-				lastVersionRan.Installed = true
 				lastVersionRan.Version = v
 				lastVersionRan.LastUpgradeName = mig.Name
 				err = lastVersionRan.Save(app)
@@ -210,11 +206,14 @@ func Up(app App) error {
 					return fmt.Errorf("error on save lastVersionRan %s: %w", mig.Name, err)
 				}
 
-				logrus.WithFields(logrus.Fields{
-					"PluginName": plugin.GetName(),
-					"version":    v,
-				}).Info("Migration done")
+				lastMigRan = mig
 
+				if len(migs) < pVersion+1 {
+					logrus.WithFields(logrus.Fields{
+						"PluginName": plugin.GetName(),
+						"version":    v,
+					}).Info("Migration done")
+				}
 			} else if v == lastVersionRan.Version {
 				lastMigRan = mig
 				continue
