@@ -322,7 +322,7 @@ func (r *AppStruct) SetDB(db *gorm.DB) error {
 func (r *AppStruct) Bootstrap() error {
 	var err error
 
-	setupMinifier(appInstance)
+	setupMinifier(r)
 
 	logrus.Debug("bolo.App.Bootstrap running")
 	// default roles and permissions, override it on your app
