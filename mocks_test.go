@@ -45,6 +45,10 @@ func (p *URLShortenerPlugin) SetName(name string) error {
 	return nil
 }
 
+func (p *URLShortenerPlugin) GetMigrations() []*bolo.Migration {
+	return []*bolo.Migration{}
+}
+
 func (p *URLShortenerPlugin) BindRoutes(app bolo.App) error {
 	ctl := p.Controller
 
