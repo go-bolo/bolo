@@ -132,8 +132,8 @@ type RequestContext struct {
 }
 
 type ResponseMessage struct {
-	Message string
-	Type    string
+	Message string `json:"message"`
+	Type    string `json:"type"`
 }
 
 /// --- Start echo.Context overrides
