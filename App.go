@@ -615,6 +615,7 @@ func NewApp(options *AppOptions) App {
 		router:        echo.New(),
 		routerGroups:  make(map[string]*echo.Group),
 		Resources:     make(map[string]*HTTPResource),
+		clock:         clock.New(),
 	}
 
 	app.RolesString, _ = acl.LoadRoles()
