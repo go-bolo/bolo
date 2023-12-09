@@ -97,7 +97,7 @@ func CustomHTTPErrorHandler(app App) func(err error, c echo.Context) {
 		if he, ok := err.(HTTPErrorInterface); ok {
 			code = he.GetCode()
 			if ctx.GetResponseContentType() == "application/json" {
-				c.JSON(code, he)
+				c.JSON(code, ParseHTTPErrorToResponse(ctx, he))
 				return
 			}
 		} else {
@@ -110,7 +110,7 @@ func CustomHTTPErrorHandler(app App) func(err error, c echo.Context) {
 		if he, ok := err.(*echo.HTTPError); ok {
 			code = he.Code
 			if ctx.GetResponseContentType() == "application/json" {
-				c.JSON(code, he)
+				c.JSON(code, ParseEchoHTTPErrorToResponse(ctx, he))
 				return
 			}
 		}
