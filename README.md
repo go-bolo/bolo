@@ -23,7 +23,8 @@ go get github.com/go-bolo/bolo
 
 ## Getting Started
 
-Here's a simple example of how you create a simple Bolo application:
+Here's a simple example of how you create a simple Bolo application without plugins and MVC structure:
+
 ```golang
 package main
 
@@ -36,7 +37,21 @@ func main() {
 	app.Get("/", func(c *bolo.Context) {
 		c.String(200, "Hello, Bolo!")
 	})
-	app.Run(":8080")
+
+	app.GetRouter().GET("/api", func(c *bolo.Context) {
+		c.String(200, "Hello, Bolo!")
+	})
+
+	err = app.Bootstrap()
+	if err != nil {
+		panic(err)
+	}
+
+	err := app.StartHTTPServer()
+	if err != nil {
+		panic(err)
+	}
+
 }
 
 ```
@@ -46,7 +61,7 @@ For more detailed instructions and examples, please refer to the documentation.
 
 ## Core events
 
-Bolo is powered by: https://github.com/gookit/event
+Bolo core event is powered by: https://github.com/gookit/event
 
 - **configuration:** This event is triggered during the application's initialization phase when the configuration is being loaded. Developers can use this event to modify or extend the configuration before it's used by the application.
 - **bindMiddlewares:** When this event is fired, Bolo is ready to bind middleware functions to the application's request-response cycle. Developers can register their custom middleware or perform additional setup for existing middleware.
