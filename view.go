@@ -64,10 +64,10 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 				"error": fmt.Sprintf("%+v\n", errors.Wrap(err, "bolo.theme.Render error on render template")),
 				"name":  name,
 			}).Error("bolo.theme.Render error on execute template")
-			return c.JSON(http.StatusInternalServerError, BaseErrorResponseMessage{
-				Status:  "error",
-				Message: "Error on render template, check if the template exists and if the data is correct. Template: " + name,
-			})
+			return c.JSON(http.StatusInternalServerError,
+				&BaseErrorResponse{
+					Messages: []BaseErrorResponseMessage{{Status: "error", Message: "Error on render template, check if the template exists and if the data is correct. Template: " + name}},
+				})
 		}
 
 		ctx.Content = template.HTML(contentBuffer.String())
