@@ -58,7 +58,7 @@ func MinifiAndRender(code int, name string, data interface{}, c *RequestContext)
 	}
 	buf := new(bytes.Buffer)
 	if err = c.Echo().Renderer.Render(buf, name, data, c); err != nil {
-		return nil
+		return err
 	}
 
 	buf2 := new(bytes.Buffer)
