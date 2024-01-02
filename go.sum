@@ -25,8 +25,8 @@ github.com/gabriel-vasile/mimetype v1.4.2 h1:w5qFW6JKBz9Y393Y4q372O9A7cUSequkh1Q
 github.com/gabriel-vasile/mimetype v1.4.2/go.mod h1:zApsH/mKG4w07erKIaJPFiX0Tsq9BFQgN3qGY5GnNgA=
 github.com/go-bolo/clock v0.0.3 h1:DbU2GQsFSBf229iMn2E2iCmEUdHp5/ntG+uACKcSZkE=
 github.com/go-bolo/clock v0.0.3/go.mod h1:Q5efvaJFdg3nGsYyjkIxansinaJcm2v02aJtzQZlcG0=
-github.com/go-bolo/query_parser_to_db v1.0.0 h1:wyaLjNqvhYHEjPoFVao1mw3DVBLg0mSoxGAOh2JT/M8=
-github.com/go-bolo/query_parser_to_db v1.0.0/go.mod h1:b2GoQ4ozvXt1GSe+2+476qSxloySI5YDxSmJ325QTvc=
+github.com/go-bolo/query_parser_to_db v1.1.0 h1:UixQED7mpzL/cTf0wVxwQFI4kROFc13TuDTfhGC3naA=
+github.com/go-bolo/query_parser_to_db v1.1.0/go.mod h1:b2GoQ4ozvXt1GSe+2+476qSxloySI5YDxSmJ325QTvc=
 github.com/go-playground/assert/v2 v2.2.0 h1:JvknZsQTYeFEAhQwI4qEt9cyV5ONwRHC+lYKSsYSR8s=
 github.com/go-playground/locales v0.14.1 h1:EWaQ/wswjilfKLTECiXz7Rh+3BjFhfDFKv/oXslEjJA=
 github.com/go-playground/locales v0.14.1/go.mod h1:hxrqLVvrK65+Rwrd5Fc6F2O76J/NuW9t0sjnWqG1slY=
@@ -151,5 +151,5 @@ gorm.io/driver/mysql v1.5.1/go.mod h1:Jo3Xu7mMhCyj8dlrb3WoCaRd1FhsVh+yMXb1jUInf5
 gorm.io/driver/sqlite v1.5.2 h1:TpQ+/dqCY4uCigCFyrfnrJnrW9zjpelWVoEVNy5qJkc=
 gorm.io/driver/sqlite v1.5.2/go.mod h1:qxAuCol+2r6PannQDpOP1FP6ag3mKi4esLnB/jHed+4=
 gorm.io/gorm v1.25.1/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=
-gorm.io/gorm v1.25.2 h1:gs1o6Vsa+oVKG/a9ElL3XgyGfghFfkKA2SInQaCyMho=
-gorm.io/gorm v1.25.2/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=
+gorm.io/gorm v1.25.5 h1:zR9lOiiYf09VNh5Q1gphfyia1JpiClIWG9hQaxB/mls=
+gorm.io/gorm v1.25.5/go.mod h1:hbnx/Oo0ChWMn1BIhpy1oYozzpM15i4YPuHDmfYtwg8=

@@ -7,7 +7,7 @@ require (
 	github.com/approvals/go-approval-tests v0.0.0-20220530063708-32d5677069bd
 	github.com/cuducos/go-cnpj v0.1.1
 	github.com/go-bolo/clock v0.0.3
-	github.com/go-bolo/query_parser_to_db v1.0.0
+	github.com/go-bolo/query_parser_to_db v1.1.0
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/gookit/event v1.1.1
 	github.com/gosimple/slug v1.13.1
@@ -24,7 +24,7 @@ require (
 	golang.org/x/text v0.12.0
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/driver/sqlite v1.5.2
-	gorm.io/gorm v1.25.2
+	gorm.io/gorm v1.25.5
 )
 
 require (
