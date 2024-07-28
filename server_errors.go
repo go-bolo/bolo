@@ -137,7 +137,7 @@ func CustomHTTPErrorHandler(app App) func(err error, c echo.Context) {
 			internalServerErrorHandler(err, ctx)
 		default:
 			logrus.WithFields(logrus.Fields{
-				"error":             fmt.Sprintf("%+v\n", err),
+				"error":             err,
 				"statusCode":        code,
 				"path":              c.Path(),
 				"method":            c.Request().Method,
@@ -153,7 +153,7 @@ func forbiddenErrorHandler(err error, c echo.Context) error {
 	ctx := c.(*RequestContext)
 
 	logParams := logrus.Fields{
-		"err":    fmt.Sprintf("%+v\n", err),
+		"error":  err,
 		"code":   "403",
 		"path":   c.Path(),
 		"method": c.Request().Method,
