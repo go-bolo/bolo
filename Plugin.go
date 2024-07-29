@@ -39,7 +39,6 @@ func (p *Plugin) setTemplateFunctions(app App) error {
 	app.SetTemplateFunction("paginate", paginate)
 	app.SetTemplateFunction("contentDates", contentDates)
 	app.SetTemplateFunction("truncate", truncate)
-	app.SetTemplateFunction("formatCurrency", formatCurrency)
 	app.SetTemplateFunction("formatDecimalWithDots", formatDecimalWithDots)
 	app.SetTemplateFunction("html", noEscapeHTML)
 	app.SetTemplateFunction("currentDate", currentDate)

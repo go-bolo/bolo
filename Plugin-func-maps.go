@@ -40,10 +40,6 @@ func truncate(text string, length int, ellipsis string) template.HTML {
 	return html
 }
 
-func formatCurrency(value decimal.Decimal) string {
-	return helpers.DecimalToPrice(value)
-}
-
 func formatDecimalWithDots(value decimal.Decimal) string {
 	return helpers.FormatDecimalWithDots(value)
 }
