@@ -74,6 +74,7 @@ func NewRequestContext(opts *RequestContextOpts) *RequestContext {
 		// get limit with max value for security:
 		if key == "limit" && len(param) == 1 {
 			queryLimit, err := strconv.ParseInt(param[0], 10, 64)
+
 			if err != nil {
 				logrus.WithFields(logrus.Fields{
 					"key":   key,
@@ -81,7 +82,7 @@ func NewRequestContext(opts *RequestContextOpts) *RequestContext {
 				}).Error("NewRequestContext invalid query param limit")
 				continue
 			}
-			if queryLimit > 0 && queryLimit < limitMax {
+			if queryLimit > 0 && queryLimit <= limitMax {
 				ctx.Pager.Limit = queryLimit
 			}
 		}
