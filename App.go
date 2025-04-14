@@ -76,6 +76,9 @@ type App interface {
 	SetRolePermission(name string, permission string, hasAccess bool) error
 	GetRolePermission(name string, permission string) bool
 
+	SetDisablePluginRoutes(disable bool)
+	IsDisablePluginRoutes() bool
+
 	GetEvents() *event.Manager
 
 	GetConfiguration() configuration.ConfigurationInterface
@@ -409,6 +412,14 @@ func (r *AppStruct) SetResource(name string, httpController HTTPController, rout
 	}
 
 	return nil
+}
+
+func (r *AppStruct) SetDisablePluginRoutes(disable bool) {
+	r.DisablePluginRoutes = disable
+}
+
+func (r *AppStruct) IsDisablePluginRoutes() bool {
+	return r.DisablePluginRoutes
 }
 
 func (r *AppStruct) InitDatabase(name, engine string, isDefault bool) error {
