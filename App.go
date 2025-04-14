@@ -123,6 +123,8 @@ type AppStruct struct {
 	router    *echo.Echo
 	Resources map[string]*HTTPResource
 
+	DisablePluginRoutes bool
+
 	routerGroups map[string]*echo.Group
 
 	RolesString string
@@ -344,8 +346,11 @@ func (r *AppStruct) Bootstrap() error {
 
 	http_client.Init()
 
-	r.Events.MustTrigger("bindMiddlewares", event.M{"app": r})
-	r.Events.MustTrigger("bindRoutes", event.M{"app": r})
+	if !r.DisablePluginRoutes {
+		r.Events.MustTrigger("bindMiddlewares", event.M{"app": r})
+		r.Events.MustTrigger("bindRoutes", event.M{"app": r})
+	}
+
 	r.Events.MustTrigger("setTemplateFunctions", event.M{"app": r})
 
 	logrus.WithFields(logrus.Fields{
@@ -643,11 +648,13 @@ func NewApp(options *AppOptions) App {
 
 	app.templates = &template.Template{}
 
-	app.SetRouterGroup("main", "/")
-	app.SetRouterGroup("public", "/public")
+	if !app.DisablePluginRoutes {
+		app.SetRouterGroup("main", "/")
+		app.SetRouterGroup("public", "/public")
 
-	apiRouterGroup := app.SetRouterGroup("api", "/api")
-	apiRouterGroup.GET("", HealthCheckHandler)
+		apiRouterGroup := app.SetRouterGroup("api", "/api")
+		apiRouterGroup.GET("", HealthCheckHandler)
+	}
 
 	app.templateFunctions = sprig.FuncMap()
 
