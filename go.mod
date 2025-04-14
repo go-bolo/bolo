@@ -5,7 +5,6 @@ go 1.20
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/approvals/go-approval-tests v0.0.0-20220530063708-32d5677069bd
-	github.com/cuducos/go-cnpj v0.1.1
 	github.com/go-bolo/clock v0.0.3
 	github.com/go-bolo/query_parser_to_db v1.1.0
 	github.com/go-playground/validator/v10 v10.22.0
