@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-bolo/bolo/helpers"
 	"github.com/go-bolo/bolo/pagination"
-	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"github.com/sirupsen/logrus"
 )
@@ -72,7 +71,7 @@ func renderResponseMessages(ctx *RequestContext) template.HTML {
 		})
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
-				"error":    fmt.Sprintf("%+v\n", errors.Wrap(err, "bolo.theme.Render error on render template")),
+				"error":    fmt.Sprintf("%+v\n", fmt.Errorf("bolo.theme.Render error on render template: %w", err)),
 				"template": "/components/response-message/response-message",
 			}).Error("bolo.theme.renderResponseMessages error on render message")
 			continue
@@ -89,7 +88,7 @@ func renderResponseMessages(ctx *RequestContext) template.HTML {
 		})
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
-				"error":    fmt.Sprintf("%+v\n", errors.Wrap(err, "bolo.theme.Render error on render template")),
+				"error":    fmt.Sprintf("%+v\n", fmt.Errorf("bolo.theme.Render error on render template: %w", err)),
 				"template": "/components/response-message/response-messages",
 			}).Error("bolo.theme.renderResponseMessages error on render messages")
 		}

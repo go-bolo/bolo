@@ -16,7 +16,6 @@ import (
 	"github.com/go-bolo/bolo/pagination"
 	"github.com/go-bolo/query_parser_to_db"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -528,7 +527,7 @@ func (r *RequestContext) GetResponseContentType() string {
 // Set response type, returns error if the type is invalid
 func (r *RequestContext) SetResponseContentType(v string) error {
 	if v == "" {
-		return errors.New("RequestContext.SetResponseContentType value should not be empty")
+		return fmt.Errorf("RequestContext.SetResponseContentType value should not be empty")
 	}
 
 	r.Set("responseContentType", v)

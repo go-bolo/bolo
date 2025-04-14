@@ -26,7 +26,6 @@ import (
 	"github.com/gookit/event"
 	"github.com/labstack/echo/v4"
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -333,7 +332,7 @@ func (r *AppStruct) Bootstrap() error {
 	for _, p := range r.Plugins {
 		err = p.Init(r)
 		if err != nil {
-			return errors.Wrap(err, "App.Bootstrap | Error on run plugin init "+p.GetName())
+			return fmt.Errorf("App.Bootstrap | Error on run plugin init %s: %w", p.GetName(), err)
 		}
 	}
 
@@ -359,7 +358,7 @@ func (r *AppStruct) Bootstrap() error {
 
 	err = r.LoadTemplates()
 	if err != nil {
-		return errors.Wrap(err, "App.Bootstrap Error on LoadTemplates")
+		return fmt.Errorf("App.Bootstrap Error on LoadTemplates: %w", err)
 	}
 
 	r.router.Renderer = &TemplateRenderer{
@@ -427,7 +426,7 @@ func (r *AppStruct) InitDatabase(name, engine string, isDefault bool) error {
 	}).Debug("bolo.App.InitDatabase starting db with configs")
 
 	if dbURI == "" {
-		return errors.New("bolo.App.InitDatabase DB_URI environment variable is required")
+		return fmt.Errorf("bolo.App.InitDatabase DB_URI environment variable is required")
 	}
 
 	dsn := dbURI + "?charset=utf8mb4&parseTime=True&loc=Local"
@@ -464,11 +463,11 @@ func (r *AppStruct) InitDatabase(name, engine string, isDefault bool) error {
 		db, err = gorm.Open(sqlite.Open(dbURI), gormCFG)
 
 	default:
-		return errors.New("bolo.App.InitDatabase invalid database engine. Options available: mysql or sqlite")
+		return fmt.Errorf("bolo.App.InitDatabase invalid database engine. Options available: mysql or sqlite")
 	}
 
 	if err != nil {
-		return errors.Wrap(err, "bolo.App.InitDatabase error on database connection")
+		return fmt.Errorf("bolo.App.InitDatabase error on database connection: %w", err)
 	}
 
 	if isDefault {
@@ -581,7 +580,7 @@ func (r *AppStruct) LoadTemplates() error {
 func (r *AppStruct) Migrate() error {
 	err, _ := r.Events.Fire("migrate", event.M{"app": r})
 	if err != nil {
-		return errors.Wrap(err, "App.Migrate migrate error")
+		return fmt.Errorf("App.Migrate migrate error: %w", err)
 	}
 
 	return nil

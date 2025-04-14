@@ -1,9 +1,8 @@
 package acl
 
 import (
-	"io/ioutil"
-
-	"github.com/pkg/errors"
+	"fmt"
+	"os"
 )
 
 type NewRoleOpts struct {
@@ -15,7 +14,7 @@ type NewRoleOpts struct {
 
 func NewRole(opts *NewRoleOpts) (*Role, error) {
 	if opts.Name == "" {
-		return nil, errors.New("NewRole name is required")
+		return nil, fmt.Errorf("NewRole name is required")
 	}
 
 	r := Role{
@@ -67,7 +66,7 @@ func (r *Role) RemovePermission(permission string) {
 func LoadRoles() (string, error) {
 	aclFileName := "acl.json"
 
-	b, err := ioutil.ReadFile(aclFileName)
+	b, err := os.ReadFile(aclFileName)
 	if err != nil {
 		return defaultRoles, nil
 	} else {

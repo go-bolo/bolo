@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"math"
 	"net/http"
 	"os"
@@ -15,7 +14,6 @@ import (
 
 	"github.com/go-bolo/bolo/pagination"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -61,7 +59,7 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 		err := ctx.RenderTemplate(&contentBuffer, name, htmlContext)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
-				"error": fmt.Sprintf("%+v\n", errors.Wrap(err, "bolo.theme.Render error on render template")),
+				"error": fmt.Sprintf("%+v\n", fmt.Errorf("bolo.theme.Render error on render template: %w", err)),
 				"name":  name,
 			}).Error("bolo.theme.Render error on execute template")
 			return c.JSON(http.StatusInternalServerError,
@@ -103,7 +101,7 @@ func findAndParseTemplates(rootDir string, funcMap template.FuncMap) (*template.
 				return e1
 			}
 
-			b, e2 := ioutil.ReadFile(path)
+			b, e2 := os.ReadFile(path)
 			if e2 != nil {
 				return e2
 			}

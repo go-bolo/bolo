@@ -3,10 +3,8 @@ package http_client
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,12 +22,12 @@ func GetPageHTML(url string, headers http.Header) (string, error) {
 	defer resp.Body.Close()
 
 	rdrBody := io.Reader(resp.Body)
-	bodyBytes, err := ioutil.ReadAll(rdrBody)
+	bodyBytes, err := io.ReadAll(rdrBody) // Replace ioutil.ReadAll with io.ReadAll
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": fmt.Sprintf("%+v\n", err),
 		}).Debug("bolo.GetPageHTML error")
-		return "", errors.Wrap(err, "GetPageHTML error")
+		return "", fmt.Errorf("GetPageHTML error: %w", err)
 	}
 
 	return string(bodyBytes), nil

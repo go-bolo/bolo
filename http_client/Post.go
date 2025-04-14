@@ -3,7 +3,7 @@ package http_client
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -36,7 +36,7 @@ func PostFormURLEncoded(url string, body url.Values, target interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body) // Replace ioutil.ReadAll with io.ReadAll
 	if err != nil {
 		return err
 	}
