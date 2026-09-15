@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"io"
 	"math"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -62,10 +61,7 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 				"error": fmt.Sprintf("%+v\n", fmt.Errorf("bolo.theme.Render error on render template: %w", err)),
 				"name":  name,
 			}).Error("bolo.theme.Render error on execute template")
-			return c.JSON(http.StatusInternalServerError,
-				&BaseErrorResponse{
-					Messages: []BaseErrorResponseMessage{{Status: "error", Message: "Error on render template, check if the template exists and if the data is correct. Template: " + name}},
-				})
+			return fmt.Errorf("bolo.theme.Render error on render template: %w", err)
 		}
 
 		ctx.Content = template.HTML(contentBuffer.String())
@@ -130,7 +126,7 @@ func renderPager(ctx *RequestContext, r *pagination.Pager, queryString string) t
 		"Pager": string(r.ToJSON()),
 	}).Debug("paginate params")
 
-	if r.Count == 0 {
+	if r.Count == 0 || r.Limit <= 0 {
 		return template.HTML("")
 	}
 

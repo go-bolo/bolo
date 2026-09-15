@@ -79,6 +79,16 @@ func CustomHTTPErrorHandler(app App) func(err error, c echo.Context) {
 			"err": fmt.Sprintf("%+v\n", err),
 		}).Debug("bolo.CustomHTTPErrorHandler running")
 
+		if c.Response().Committed {
+			logrus.WithFields(logrus.Fields{
+				"err":  fmt.Sprintf("%+v\n", err),
+				"path": c.Path(),
+				"code": c.Response().Status,
+				"size": c.Response().Size,
+			}).Warn("bolo.CustomHTTPErrorHandler response already committed")
+			return
+		}
+
 		var ctx *RequestContext
 
 		switch v := c.(type) {
@@ -294,7 +304,7 @@ func validationError(ve validator.ValidationErrors, err error, ctx *RequestConte
 
 	switch ctx.GetResponseContentType() {
 	case "text/html":
-		if ctx.Title != "" {
+		if ctx.Title == "" {
 			ctx.Title = "Bad request"
 		}
 
