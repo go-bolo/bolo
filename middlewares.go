@@ -21,11 +21,21 @@ func BindMiddlewares(app App, p *Plugin) {
 	}))
 
 	router.Use(middleware.Gzip())
+	router.Use(middleware.Recover())
+
+	allowOrigins := parseCORSAllowOrigins(app.GetConfiguration().GetF("CORS_ALLOW_ORIGINS", ""))
+
 	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowCredentials: app.GetConfiguration().GetBoolF("CORS_ALLOW_CREDENTIALS", true),
+		AllowCredentials: app.GetConfiguration().GetBoolF("CORS_ALLOW_CREDENTIALS", false),
 		MaxAge:           app.GetConfiguration().GetIntF("CORS_MAX_AGE", 18000), // seccounds
 		AllowOriginFunc: func(origin string) (bool, error) {
-			return true, nil
+			for _, allowed := range allowOrigins {
+				if origin == allowed {
+					return true, nil
+				}
+			}
+
+			return false, nil
 		},
 	}))
 
@@ -42,6 +52,22 @@ func BindMiddlewares(app App, p *Plugin) {
 
 func isPublicRoute(url string) bool {
 	return strings.HasPrefix(url, "/health") || strings.HasPrefix(url, "/public")
+}
+
+// parseCORSAllowOrigins parses the CORS_ALLOW_ORIGINS comma separated
+// allowlist, trimming spaces around each entry. An empty list fails closed.
+func parseCORSAllowOrigins(raw string) []string {
+	entries := strings.Split(raw, ",")
+
+	allowOrigins := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		origin := strings.TrimSpace(entry)
+		if origin != "" {
+			allowOrigins = append(allowOrigins, origin)
+		}
+	}
+
+	return allowOrigins
 }
 
 // Middleware that update echo context to use custom methods
