@@ -21,6 +21,17 @@ func GetPageHTML(url string, headers http.Header) (string, error) {
 
 	defer resp.Body.Close()
 
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		err := fmt.Errorf("GetPageHTML error: unexpected status %s", resp.Status)
+		logrus.WithFields(logrus.Fields{
+			"url":     url,
+			"status":  resp.Status,
+			"headers": headers,
+			"error":   err,
+		}).Error("GetPageHTML error")
+		return "", err
+	}
+
 	rdrBody := io.Reader(resp.Body)
 	bodyBytes, err := io.ReadAll(rdrBody) // Replace ioutil.ReadAll with io.ReadAll
 	if err != nil {

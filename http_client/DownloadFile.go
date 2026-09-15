@@ -1,6 +1,7 @@
 package http_client
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -37,6 +38,16 @@ func DownloadFile(url string, dest *os.File, headers http.Header) (bool, error) 
 	}
 
 	defer res.Body.Close()
+
+	if res.StatusCode < 200 || res.StatusCode > 299 {
+		err = fmt.Errorf("DownloadFile error: unexpected status %s", res.Status)
+		logrus.WithFields(logrus.Fields{
+			"url":    url,
+			"status": res.Status,
+			"error":  err,
+		}).Error("DownloadFile error")
+		return false, err
+	}
 
 	_, err = io.Copy(dest, res.Body)
 	if err != nil {

@@ -18,6 +18,9 @@ var (
 
 func Init() {
 	httpClientTimeout := configuration.GetInt64Env("HTTP_CLIENT_TIMEOUT", 120)
+	if httpClientTimeout <= 0 {
+		httpClientTimeout = 120
+	}
 
 	timeout := time.Second * time.Duration(httpClientTimeout)
 	HttpClient = &http.Client{Timeout: timeout}
