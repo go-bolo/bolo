@@ -330,7 +330,20 @@ func (r *AppStruct) Bootstrap() error {
 
 	logrus.Debug("bolo.App.Bootstrap running")
 	// default roles and permissions, override it on your app
-	json.Unmarshal([]byte(r.RolesString), &r.RolesList)
+	rolesJSON, err := acl.LoadRoles()
+	if err != nil {
+		return fmt.Errorf("App.Bootstrap | Error on load roles: %w", err)
+	}
+
+	r.RolesString = rolesJSON
+
+	if err := json.Unmarshal([]byte(rolesJSON), &r.RolesList); err != nil {
+		return fmt.Errorf("App.Bootstrap | Error on parse roles JSON: %w", err)
+	}
+
+	if _, ok := r.RolesList["administrator"]; !ok {
+		return fmt.Errorf("App.Bootstrap | Error on roles: mandatory administrator system role is missing")
+	}
 
 	for _, p := range r.Plugins {
 		err = p.Init(r)
@@ -515,6 +528,10 @@ func (r *AppStruct) Can(permission string, userRoles []string) bool {
 
 	for j := range userRoles {
 		R := r.RolesList[userRoles[j]]
+		if R == nil {
+			continue
+		}
+
 		if R.Can(permission) {
 			return true
 		}
@@ -543,7 +560,7 @@ func (r *AppStruct) GetRole(name string) *acl.Role {
 func (r *AppStruct) SetRolePermission(name string, permission string, hasAccess bool) error {
 	role := r.GetRole(name)
 	if role == nil {
-		return nil
+		return fmt.Errorf("App.SetRolePermission role %s not found", name)
 	}
 
 	if hasAccess {
@@ -556,8 +573,12 @@ func (r *AppStruct) SetRolePermission(name string, permission string, hasAccess 
 }
 
 func (r *AppStruct) GetRolePermission(name string, permission string) bool {
+	role := r.GetRole(name)
+	if role == nil {
+		return false
+	}
 
-	return false
+	return role.Can(permission)
 }
 
 func (r *AppStruct) LoadTemplates() error {

@@ -35,6 +35,10 @@ type Role struct {
 }
 
 func (r *Role) Can(permission string) bool {
+	if r == nil {
+		return false
+	}
+
 	for i := range r.Permissions {
 		if permission == r.Permissions[i] {
 			return true
@@ -68,10 +72,14 @@ func LoadRoles() (string, error) {
 
 	b, err := os.ReadFile(aclFileName)
 	if err != nil {
-		return defaultRoles, nil
-	} else {
-		return string(b), nil
+		if os.IsNotExist(err) {
+			return defaultRoles, nil
+		}
+
+		return "", fmt.Errorf("LoadRoles error on read %s: %w", aclFileName, err)
 	}
+
+	return string(b), nil
 }
 
 var defaultRoles = `{
