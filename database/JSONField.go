@@ -19,10 +19,18 @@ func (j *JSONField) Scan(value interface{}) error {
 		*j = nil
 		return nil
 	}
-	s, ok := value.([]byte)
-	if !ok {
+
+	var s []byte
+
+	switch v := value.(type) {
+	case []byte:
+		s = v
+	case string:
+		s = []byte(v)
+	default:
 		return errors.New("Invalid Scan Source")
 	}
+
 	*j = append((*j)[0:0], s...)
 	return nil
 }
