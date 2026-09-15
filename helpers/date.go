@@ -11,7 +11,7 @@ func FormatDate(date *time.Time, format string) string {
 	timeZone := configuration.GetEnv("SITE_TIMEZONE", "")
 	loc, err := time.LoadLocation(timeZone)
 	if err != nil {
-		panic(err)
+		loc = date.Location()
 	}
 
 	return date.In(loc).Format(format)

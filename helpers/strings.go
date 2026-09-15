@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"math/rand"
+	"unicode/utf8"
 
 	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/text/language"
@@ -38,36 +39,19 @@ func RandStringBytes(n int) string {
 
 var stripTagsPolicy = bluemonday.StripTagsPolicy()
 
-// TruncateString - Truncate one string with with x words
+// TruncateString - Truncate one string with with x runes
 func TruncateString(str string, length int, omission string) string {
 	if length <= 0 {
 		return ""
 	}
 
-	orgLen := len(str)
-	if orgLen <= length {
+	if utf8.RuneCountInString(str) <= length {
 		return str
 	}
 
-	if orgLen > length {
-		return str[:length] + omission
-	}
+	runes := []rune(str)
 
-	return str[:length]
-
-	// // Support Japanese
-	// // Ref: Range loops https://blog.golang.org/strings
-	// truncated := ""
-	// count := 0
-	// for _, char := range str {
-	// 	truncated += string(char)
-	// 	count++
-	// 	if count >= length {
-	// 		break
-	// 	}
-	// }
-
-	// return truncated
+	return string(runes[:length]) + omission
 }
 
 // StripTags - Remove tags from html text
