@@ -28,8 +28,8 @@ func (m *MigrationEngine) SetupMigrationEngine() error {
 		version INT NULL,
 		last_upgrade_name varchar(255) NULL,
 		installed bool DEFAULT false NOT NULL,
-		created_at datetime DEFAULT NOW() NOT NULL,
-		updated_at datetime DEFAULT NOW() NOT NULL,
+		created_at datetime NOT NULL,
+		updated_at datetime NOT NULL,
 		last_error TEXT NULL,
 		CONSTRAINT plugin_name PRIMARY KEY (plugin_name)
 	)`).Error
@@ -144,15 +144,6 @@ func Up(app App) error {
 	}
 
 	for _, plugin := range plugins {
-		defer func() {
-			if r := recover(); r != nil {
-				logrus.WithFields(logrus.Fields{
-					"pluginName": plugin.GetName(),
-					"error":      r,
-				}).Error("Recovered from a error on run migration migration")
-			}
-		}()
-
 		migs := plugin.GetMigrations()
 
 		logrus.WithFields(logrus.Fields{
@@ -188,19 +179,34 @@ func Up(app App) error {
 			}).Debug("Mig:")
 
 			if lastVersionRan.Version == 0 || lastMigRan != nil {
-				err := mig.Up(app)
-				if err != nil {
+				migErr := func() (err error) {
+					defer func() {
+						if r := recover(); r != nil {
+							err = fmt.Errorf("panic on run migration up %s: %v", mig.Name, r)
+							logrus.WithFields(logrus.Fields{
+								"PluginName": plugin.GetName(),
+								"migration":  mig.Name,
+								"panic":      r,
+							}).Error("Recovered from a panic on run migration up")
+						}
+					}()
+
+					return mig.Up(app)
+				}()
+
+				if migErr != nil {
 					lastVersionRan.LastUpgradeName = mig.Name
-					lastVersionRan.LastError = err.Error()
+					lastVersionRan.LastError = migErr.Error()
 					err2 := lastVersionRan.Save(app)
 					if err2 != nil {
-						return fmt.Errorf("error on save lastVersionRan %s: %w : %w", mig.Name, err2, err)
+						return fmt.Errorf("error on save lastVersionRan %s: %w : %w", mig.Name, err2, migErr)
 					}
-					return fmt.Errorf("error on run migration up %s: %w", mig.Name, err)
+					return fmt.Errorf("error on run migration up %s: %w", mig.Name, migErr)
 				}
 
 				lastVersionRan.Version = v
 				lastVersionRan.LastUpgradeName = mig.Name
+				lastVersionRan.LastError = ""
 				err = lastVersionRan.Save(app)
 				if err != nil {
 					return fmt.Errorf("error on save lastVersionRan %s: %w", mig.Name, err)
@@ -227,6 +233,7 @@ func Up(app App) error {
 }
 
 func Down(app App) error {
-	logrus.Warn("TODO!")
-	return nil
+	logrus.Warn("bolo.Down is not implemented yet")
+
+	return errors.New("bolo.Down rollback is not implemented yet")
 }
