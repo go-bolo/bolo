@@ -60,6 +60,7 @@ func TestApp_Bootstrap(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := bolo.NewApp(&bolo.AppOptions{})
+			isolateTestBootstrap(t, got)
 			err := got.Bootstrap()
 			assert.Nil(t, err)
 
@@ -69,7 +70,7 @@ func TestApp_Bootstrap(t *testing.T) {
 }
 
 func TestRequest_CRUD(t *testing.T) {
-	app := GetTestApp()
+	app := GetTestApp(t)
 	app.RegisterPlugin(&URLShortenerPlugin{Name: "example"})
 	err := app.Bootstrap()
 	assert.Nil(t, err)
