@@ -1,3 +1,5 @@
 *.sqlite
 *.sql
 **.received.*
+.tasks
+.kilo
