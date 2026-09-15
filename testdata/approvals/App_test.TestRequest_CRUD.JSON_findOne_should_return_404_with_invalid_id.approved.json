@@ -1,4 +1,9 @@
 {
-  "code": 404,
-  "message": "Not found"
+  "messages": [
+    {
+      "code": 404,
+      "message": "Not found",
+      "status": "warning"
+    }
+  ]
 }

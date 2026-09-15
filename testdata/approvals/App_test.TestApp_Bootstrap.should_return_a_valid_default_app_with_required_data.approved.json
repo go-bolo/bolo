@@ -9,7 +9,7 @@
     "GormOptions": null
   },
   "Events": {
-    "EnableLock": true,
+    "EnableLock": false,
     "ChannelSize": 100,
     "ConsumerNum": 3,
     "MatchMode": 0
@@ -22,6 +22,7 @@
   ],
   "Models": {},
   "Resources": {},
+  "DisablePluginRoutes": false,
   "RolesString": "{\n\t\"administrator\": {\n\t\t\"name\": \"administrator\",\n\t\t\"permissions\": [],\n\t\t\"canAddInUsers\": true,\n\t\t\"isSystemRole\": true\n\t},\n\t\"authenticated\": {\n\t\t\"name\": \"authenticated\",\n\t\t\"permissions\": [],\n\t\t\"isSystemRole\": true\n\t},\n\t\"unAuthenticated\": {\n\t\t\"name\": \"unAuthenticated\",\n\t\t\"permissions\": [],\n\t\t\"isSystemRole\": true\n\t},\n\t\"owner\": {\n\t\t\"name\": \"owner\",\n\t\t\"permissions\": [],\n\t\t\"isSystemRole\": true\n\t}}",
   "RolesList": {
     "administrator": {
