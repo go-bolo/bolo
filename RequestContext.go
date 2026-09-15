@@ -500,11 +500,12 @@ func (r *RequestContext) AddBodyClass(class string) {
 
 // Remove a body class string checking if is unique
 func (r *RequestContext) RemoveBodyClass(class string) {
-	if !helpers.SliceContains(r.BodyClass, class) {
-		return
+	for i, c := range r.BodyClass {
+		if c == class {
+			r.BodyClass = append(r.BodyClass[:i], r.BodyClass[i+1:]...)
+			return
+		}
 	}
-
-	r.BodyClass = append(r.BodyClass, class)
 }
 
 // Get body class as string,

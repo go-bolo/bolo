@@ -220,8 +220,8 @@ func (app *AppStruct) NewRequestContext(opts *RequestContextOpts) *RequestContex
 		Domain:      domain,
 		AppOrigin:   cfg.GetF("APP_ORIGIN", protocol+"://"+domain+":"+port),
 		// Title:               "",
-		Theme:  cfg.GetF("THEME", "site"),
-		Layout: "layouts/default",
+		Theme:  app.GetTheme(),
+		Layout: app.GetLayout(),
 		ENV:    cfg.GetF("GO_ENV", "development"),
 		Query:  query_parser_to_db.NewQuery(50),
 		Pager:  pagination.NewPager(),
@@ -260,7 +260,7 @@ func (app *AppStruct) NewRequestContext(opts *RequestContextOpts) *RequestContex
 				}).Error("NewRequestContext invalid query param limit")
 				continue
 			}
-			if queryLimit > 0 && queryLimit < limitMax {
+			if queryLimit > 0 && queryLimit <= limitMax {
 				ctx.Pager.Limit = queryLimit
 			}
 		}
