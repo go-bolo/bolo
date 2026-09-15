@@ -1,33 +1,90 @@
 package http_client
 
-// var mocks_folder = "../../../_mocks"
+import (
+	"net/http"
+	"testing"
 
-// func init() {
-// 	HttpClient = &MockClient{}
-// }
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
-// func TestGetPageHTML(t *testing.T) {
-// 	t.Run("GetPageHTML should work with mock and return the mocked data", func(t *testing.T) {
-// 		htmlByte, err := ioutil.ReadFile(mocks_folder + "/cvm/dfp-list.html")
-// 		assert.Nil(t, err)
+// TestGetPageHTML covers CLI-02: GetPageHTML with a fake CustomHTTPClient,
+// no network involved.
+func TestGetPageHTML(t *testing.T) {
+	t.Run("CLI-02/200 returns the response body", func(t *testing.T) {
+		body := newTraceableBody("<html>page</html>")
+		fake := &recordingClient{resp: newFakeResponse(http.StatusOK, body)}
+		withFakeHTTPClient(t, fake)
 
-// 		r := ioutil.NopCloser(bytes.NewReader([]byte(htmlByte)))
+		html, err := GetPageHTML("http://example.test/page", nil)
 
-// 		GetDoFunc = func(*http.Request) (*http.Response, error) {
-// 			return &http.Response{
-// 				StatusCode: 200,
-// 				Body:       r,
-// 			}, nil
-// 		}
+		require.NoError(t, err)
+		assert.Equal(t, "<html>page</html>", html)
+	})
 
-// 		url := "http://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/DFP/DADOS/"
-// 		var headers http.Header
+	t.Run("CLI-02/forwards headers to the transport", func(t *testing.T) {
+		fake := &recordingClient{resp: newFakeResponse(http.StatusOK, newTraceableBody("ok"))}
+		withFakeHTTPClient(t, fake)
 
-// 		body, err := GetPageHTML(url, headers)
-// 		assert.NotNil(t, body)
-// 		assert.Nil(t, err)
+		headers := http.Header{}
+		headers.Set("Authorization", "Bearer token")
+		headers.Set("Accept", "text/html")
 
-// 		t.Log("body length", len(body))
-// 		assert.EqualValues(t, string(htmlByte), body)
-// 	})
-// }
+		_, err := GetPageHTML("http://example.test/page", headers)
+
+		require.NoError(t, err)
+		req := fake.lastRequest()
+		require.NotNil(t, req)
+		assert.Equal(t, "Bearer token", req.Header.Get("Authorization"))
+		assert.Equal(t, "text/html", req.Header.Get("Accept"))
+	})
+
+	t.Run("CLI-02/propagates body read errors and closes the body", func(t *testing.T) {
+		body := &failingBody{}
+		fake := &recordingClient{resp: newFakeResponse(http.StatusOK, body)}
+		withFakeHTTPClient(t, fake)
+
+		html, err := GetPageHTML("http://example.test/page", nil)
+
+		require.Error(t, err)
+		assert.ErrorIs(t, err, errFakeReadFailure)
+		assert.Empty(t, html)
+		assert.True(t, body.closed, "response body must be closed even on read failure")
+	})
+
+	t.Run("CLI-02/propagates transport errors", func(t *testing.T) {
+		fake := &recordingClient{err: errFakeTransport}
+		withFakeHTTPClient(t, fake)
+
+		html, err := GetPageHTML("http://example.test/page", nil)
+
+		require.Error(t, err)
+		assert.ErrorIs(t, err, errFakeTransport)
+		assert.Empty(t, html)
+	})
+
+	t.Run("CLI-02/closes the response body on success", func(t *testing.T) {
+		body := newTraceableBody("ok")
+		fake := &recordingClient{resp: newFakeResponse(http.StatusOK, body)}
+		withFakeHTTPClient(t, fake)
+
+		_, err := GetPageHTML("http://example.test/page", nil)
+
+		require.NoError(t, err)
+		assert.True(t, body.closed, "response body must be closed after a successful read")
+	})
+
+	t.Run("CLI-02/non-2xx response returns an error", func(t *testing.T) {
+		// Expected contract: high level helpers must treat non-2xx as an
+		// error instead of returning the error page body as valid content.
+		// Known defect: today the 404 body is returned with a nil error.
+		body := newTraceableBody("404 page body")
+		fake := &recordingClient{resp: newFakeResponse(http.StatusNotFound, body)}
+		withFakeHTTPClient(t, fake)
+
+		html, err := GetPageHTML("http://example.test/missing", nil)
+
+		assert.Error(t, err, "non-2xx responses must produce an error")
+		assert.Empty(t, html, "non-2xx error body must not be returned as content")
+	})
+}

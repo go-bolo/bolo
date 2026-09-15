@@ -1,0 +1,1 @@
+<nav class="pagination">{{if .Ctx.HasPrevius}}<a class="previous" href="{{.Ctx.PreviusPath}}">{{.Ctx.PreviusNumber}}</a>{{end}}{{range .Ctx.Links}}<a class="page{{if .IsActive}} active{{end}}" href="{{.Path}}">{{.Number}}</a>{{end}}{{if .Ctx.HasNext}}<a class="next" href="{{.Ctx.NextPath}}">{{.Ctx.NextNumber}}</a>{{end}}</nav>
